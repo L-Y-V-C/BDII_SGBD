@@ -2,10 +2,9 @@
 *
 
 # ¡Exceptuar solo lo que quieres!
-!BDII_SGBD/
-!BDII_SGBD/main.cpp
-!BDII_SGBD/tree.hh
-!BDII_SGBD/node.hh
+!main.cpp
+!tree.hh
+!node.hh
 
 # Excluir archivos comunes de Visual Studio que podrían estar en la raíz
 *.sln
