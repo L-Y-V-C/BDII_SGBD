@@ -8,6 +8,7 @@
 !disk.hh
 !dataReader.hh
 
+
 # Excluir archivos comunes de Visual Studio que podrían estar en la raíz
 *.sln
 *.vcxproj
