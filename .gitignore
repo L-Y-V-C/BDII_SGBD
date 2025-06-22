@@ -1,0 +1,31 @@
+# Ignorar todo por defecto
+*
+
+# ¡Exceptuar solo lo que quieres!
+!BDII_SGBD/
+!BDII_SGBD/main.cpp
+!BDII_SGBD/tree.hh
+!BDII_SGBD/node.hh
+
+# Excluir archivos comunes de Visual Studio que podrían estar en la raíz
+*.sln
+*.vcxproj
+*.vcxproj.*
+*.user
+*.filters
+*.log
+*.obj
+*.exe
+*.pdb
+*.idb
+*.ipch
+*.tlog
+*.lastbuildstate
+*.VC.db
+*.opendb
+
+# Ignorar carpetas comunes de salida
+[Bb]in/
+[Oo]bj/
+x64/
+.vs/
