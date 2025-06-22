@@ -5,6 +5,7 @@
 !main.cpp
 !tree.hh
 !node.hh
+!disk.hh
 
 # Excluir archivos comunes de Visual Studio que podrían estar en la raíz
 *.sln
