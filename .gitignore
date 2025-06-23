@@ -6,6 +6,11 @@
 !tree.hh
 !node.hh
 !disk.hh
+!plate.hh
+!surface.hh
+!track.hh
+!sector.hh
+!sectorIterator.hh
 
 # Excluir archivos comunes de Visual Studio que podrían estar en la raíz
 *.sln
