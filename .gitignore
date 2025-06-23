@@ -6,6 +6,7 @@
 !tree.hh
 !node.hh
 !disk.hh
+!dataReader.hh
 !plate.hh
 !surface.hh
 !track.hh
