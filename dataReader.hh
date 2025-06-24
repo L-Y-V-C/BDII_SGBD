@@ -9,7 +9,6 @@
 #include <sstream>
 #include <vector>
 
-
 class DataReader
 {
 public:

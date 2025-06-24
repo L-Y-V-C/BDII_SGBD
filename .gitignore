@@ -7,7 +7,14 @@
 !node.hh
 !disk.hh
 !dataReader.hh
-
+!plate.hh
+!surface.hh
+!track.hh
+!sector.hh
+!sectorIterator.hh
+!dataStruct.hh
+!struct_table.txt
+!taxables.csv
 
 # Excluir archivos comunes de Visual Studio que podrían estar en la raíz
 *.sln
