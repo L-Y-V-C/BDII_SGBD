@@ -9,80 +9,135 @@
 #include <sstream>
 #include <vector>
 
-#include "dataStruct.hh"
-
 class DataReader
 {
 public:
-	DataStruct ds;
-	std::string archiveDataStruct;
-	std::string archiveDataCSV;
-	using data_line = std::vector<std::vector<std::string>>;
 
-	// OLD
-	data_line read_data_arr_arr_str(std::string data_path)
+	using vector_data = std::vector< std::vector <std::string>>;
+
+	vector_data get_format(std::string meta_data_path)
 	{
-		data_line data_rows;
-
-		std::ifstream file(data_path);
-
-		std::string line;
-		std::stringstream ss(line); 
-
-		while (std::getline(file, line))
-		{
-			std::stringstream ss(line);
-			std::string field;
-
-			std::vector<std::string> row;
-			while (std::getline(ss, field, ','))
-				row.push_back(field);
-			
-			data_rows.push_back(row);
-		}		
-		
-		file.close();
-		return data_rows;
-	}
-
-	std::vector<int> get_meta_data_size(std::string meta_data_path)
-	{
-		std::vector<int> data_size;
 		std::ifstream file(meta_data_path);
-
 		std::string line;
+		vector_data vector;
+
 		while (std::getline(file, line))
 		{
-			std::vector<std::string> row = get_row(line, ',');
-			data_size.push_back(std::stoi(row[1]));
+			std::vector<std::string> row = get_row(line, ' ');
+
+			if (row.size() > 3)
+			{
+				std::string name = row[0];
+				std::string type = row[1].substr(0, row[1].find('('));
+
+				// Combinacion
+				std::string length = row[1] + row[2];
+				size_t start = length.find('(');
+				size_t end = length.find(')');
+				length = length.substr(start + 1, end - start);
+
+				vector.push_back({ name, type, length });
+			}
 		}
 
-		
 		file.close();
-		return data_size;
+		return vector;
 	}
 
 	std::string read_data(std::string data_path, std::string meta_data_path)
 	{
-		std::vector<int> data_size{ get_meta_data_size(meta_data_path) };
-
 		std::ifstream file(data_path);
 		std::string line, data_line;
+		vector_data format_vector{ get_format(meta_data_path) };
+
+		int line_counter{ 0 };
 
 		while (std::getline(file, line))
 		{
+			if (line_counter++ == 0)
+				continue;
+
+			// Get item name without quotation marks
+			std::string item;
+			size_t first_quote = line.find_first_of('"');
+			size_t second_quote = line.find_last_of('"');
+			item = line.substr(first_quote + 1, second_quote - first_quote - 1);
+
+
+
+			// Fill empty item name with "WORD"
+			line = line.substr(0, line.find_first_of(',')) + ",WORD" + line.substr(line.find_last_of('"') + 1, line.size() - (line.find_last_of('"') + 1));
+			// Erase spaces
+			line.erase(std::remove(line.begin(), line.end(), ' '), line.end());
+
+
 			std::vector<std::string> row = get_row(line, ',');
 
-			for (int i = 0; i < data_size.size(); i++)
+			int counter{ 0 };
+			for (int i = 0; i < row.size(); i++)
 			{
-				if (data_size[i] != -1) // Es string
-					data_line += format_string(data_size[i], row[i], '-');
-				else					// No es string
-					data_line += row[i];
 
-				data_line += ',';       // Field separator
+				std::string& name{ format_vector[i][0] },
+					& type{ format_vector[i][1] },
+					& number{ format_vector[i][2] },
+
+
+					& value{ row[i] };
+
+
+
+				std::string temp;
+
+				if (type == "INTEGER")
+				{
+					int limit{ std::stoi(number) };
+					temp.resize(limit, '0');
+
+					for (int i = 0; i < limit && i < value.size(); i++)
+						temp[limit - 1 - i] = value[value.size() - 1 - i];
+				}
+				else if (type == "DECIMAL")
+				{
+					size_t comma_pos = number.find(',');
+
+					int num_size{ std::stoi(number.substr(0, comma_pos)) };
+
+					int float_size{ std::stoi(number.substr(comma_pos + 1)) },
+						int_size{ num_size - float_size };
+
+
+					int dot_pos = int_size;
+					temp.resize(num_size + 1, '0');
+					temp[dot_pos] = '.';
+
+
+					// String values of int part and float part
+					size_t dot_index = value.find('.');
+					std::string int_part{ value.substr(0, dot_index) },
+						float_part{ value.substr(dot_index + 1, value.size() - dot_index) };
+
+					// Int
+					for (int i = 0; i < int_size && i < int_part.size(); i++)
+						temp[dot_pos - 1 - i] = int_part[int_part.size() - 1 - i];
+
+					// Float
+					for (int i = 0; i < float_size && i < float_part.size(); i++)
+						temp[dot_pos + 1 + i] = float_part[i];
+
+				}
+				else if (type == "VARCHAR") // item copy
+				{
+					int limit{ std::stoi(number) };
+					temp.resize(limit, '\0');
+
+					for (int i = 0; i < limit && i < item.size(); i++)
+						temp[i] = item[i];
+				}
+
+				data_line += temp + ',';
 			}
-			data_line += '/';			// Register separator
+
+			data_line += '/';
 		}
 
 		file.close();
@@ -94,102 +149,7 @@ public:
 
 	}
 
-	// file read methods ------------------------------------
-	int countLinesOfTheArchive() {
-		std::ifstream archive(archiveDataStruct);
-		if (!archive.is_open()) {
-			std::cerr << "No se pudo abrir el archivo." << std::endl;
-			return 0;
-		}
-		int counter = 0;
-		std::string line;
-		while (std::getline(archive, line)) {
-			if (line[0] == ')') {
-				break;
-			}
-			counter++;
-		}
-		counter--;
-		return counter;
-	}
-	void resizeDataStruct() {
-		int n = countLinesOfTheArchive();
-		ds.field.resize(n);
-		ds.number.resize(n);
-	}
-	void fillDataStructFromArchive() {
-		std::ifstream archive(archiveDataStruct);
-		if (!archive.is_open()) {
-			std::cerr << "No se pudo abrir el archivo." << std::endl;
-			return;
-		}
-		std::string line;
-		bool tableNameFound = false;
-		for (int i = 0; std::getline(archive, line);) {
-			//while (std::getline(archive, line)) {
-			if (line[0] == ')') {
-				break;
-			}
-			// erase spaces at start
-			line.erase(0, line.find_first_not_of(" \t"));
-			// find table name
-			if (!tableNameFound && line.find("CREATE TABLE") != std::string::npos) {
-				size_t ini = line.find("TABLE") + 6;
-				size_t fin = line.find('(', ini);
-				ds.tableName = line.substr(ini, fin - ini);
-				// erase spaces at end
-				ds.tableName.erase(ds.tableName.find_last_not_of(" \t") + 1);
-				tableNameFound = true;
-				continue;
-			}
-			std::string lineAux = line;
-			size_t parenIni = line.find('(');
-			lineAux = lineAux.substr(0, parenIni);
-
-			std::istringstream ss(lineAux);
-			std::string tipo;
-			ss >> ds.field[i] >> tipo;
-
-			// erase comma
-			if (!ds.field[i].empty() && ds.field[i].back() == ',')
-				ds.field[i].pop_back();
-			if (!tipo.empty() && tipo.back() == ',')
-				tipo.pop_back();
-
-			// find numbers
-			//size_t parenIni = line.find('(');
-			if (parenIni != std::string::npos) {
-				size_t parenFin = line.find(')', parenIni);
-				std::string content = line.substr(parenIni + 1, parenFin - parenIni - 1);
-				//std::cout << tipo << "\n";
-				if (tipo == "DECIMAL") {
-					size_t comma = content.find(',');
-					if (comma != std::string::npos) {
-						std::string numberAux = content.substr(0, comma);
-						ds.number[i] = std::stoi(numberAux) + 1;
-					}
-				}
-				else {
-					ds.number[i] = std::stoi(content);
-				}
-			}
-			i++;
-		}
-		archive.close();
-	}
-	//-------------------------------------------------------
-
 private:
-	std::string format_string(int new_str_size, std::string& str_to_format, char in_char)
-	{
-		std::string to_return(new_str_size, in_char);
-
-		for (int i = 0; i < str_to_format.length() && i < new_str_size; i++)
-			to_return[i] = str_to_format[i];
-
-		return to_return;
-	}
-
 	std::vector<std::string> get_row(std::string& line, char delimiter = ',')
 	{
 		std::vector<std::string> row;
