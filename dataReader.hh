@@ -9,10 +9,14 @@
 #include <sstream>
 #include <vector>
 
+#include "dataStruct.hh"
 
 class DataReader
 {
 public:
+	DataStruct ds;
+	std::string archiveDataStruct;
+	std::string archiveDataCSV;
 	using data_line = std::vector<std::vector<std::string>>;
 
 	// OLD
@@ -89,6 +93,91 @@ public:
 	{
 
 	}
+
+	// file read methods ------------------------------------
+	int countLinesOfTheArchive() {
+		std::ifstream archive(archiveDataStruct);
+		if (!archive.is_open()) {
+			std::cerr << "No se pudo abrir el archivo." << std::endl;
+			return 0;
+		}
+		int counter = 0;
+		std::string line;
+		while (std::getline(archive, line)) {
+			if (line[0] == ')') {
+				break;
+			}
+			counter++;
+		}
+		counter--;
+		return counter;
+	}
+	void resizeDataStruct() {
+		int n = countLinesOfTheArchive();
+		ds.field.resize(n);
+		ds.number.resize(n);
+	}
+	void fillDataStructFromArchive() {
+		std::ifstream archive(archiveDataStruct);
+		if (!archive.is_open()) {
+			std::cerr << "No se pudo abrir el archivo." << std::endl;
+			return;
+		}
+		std::string line;
+		bool tableNameFound = false;
+		for (int i = 0; std::getline(archive, line);) {
+			//while (std::getline(archive, line)) {
+			if (line[0] == ')') {
+				break;
+			}
+			// erase spaces at start
+			line.erase(0, line.find_first_not_of(" \t"));
+			// find table name
+			if (!tableNameFound && line.find("CREATE TABLE") != std::string::npos) {
+				size_t ini = line.find("TABLE") + 6;
+				size_t fin = line.find('(', ini);
+				ds.tableName = line.substr(ini, fin - ini);
+				// erase spaces at end
+				ds.tableName.erase(ds.tableName.find_last_not_of(" \t") + 1);
+				tableNameFound = true;
+				continue;
+			}
+			std::string lineAux = line;
+			size_t parenIni = line.find('(');
+			lineAux = lineAux.substr(0, parenIni);
+
+			std::istringstream ss(lineAux);
+			std::string tipo;
+			ss >> ds.field[i] >> tipo;
+
+			// erase comma
+			if (!ds.field[i].empty() && ds.field[i].back() == ',')
+				ds.field[i].pop_back();
+			if (!tipo.empty() && tipo.back() == ',')
+				tipo.pop_back();
+
+			// find numbers
+			//size_t parenIni = line.find('(');
+			if (parenIni != std::string::npos) {
+				size_t parenFin = line.find(')', parenIni);
+				std::string content = line.substr(parenIni + 1, parenFin - parenIni - 1);
+				//std::cout << tipo << "\n";
+				if (tipo == "DECIMAL") {
+					size_t comma = content.find(',');
+					if (comma != std::string::npos) {
+						std::string numberAux = content.substr(0, comma);
+						ds.number[i] = std::stoi(numberAux) + 1;
+					}
+				}
+				else {
+					ds.number[i] = std::stoi(content);
+				}
+			}
+			i++;
+		}
+		archive.close();
+	}
+	//-------------------------------------------------------
 
 private:
 	std::string format_string(int new_str_size, std::string& str_to_format, char in_char)
