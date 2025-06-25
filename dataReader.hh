@@ -8,6 +8,8 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include "sectorIterator.hh"
+
 
 class DataReader
 {
@@ -15,11 +17,13 @@ public:
 
 	using vector_data = std::vector< std::vector <std::string>>;
 
-	vector_data get_format(std::string meta_data_path)
+	DataReader():
+		data_info(), data_size(), total_register_size(0), register_count(0) { }
+
+	void get_format(std::string table_data_path)
 	{
-		std::ifstream file(meta_data_path);
+		std::ifstream file(table_data_path);
 		std::string line;
-		vector_data vector;
 
 		while (std::getline(file, line))
 		{
@@ -34,21 +38,34 @@ public:
 				std::string length = row[1] + row[2];
 				size_t start = length.find('(');
 				size_t end = length.find(')');
-				length = length.substr(start + 1, end - start);
+				length = length.substr(start + 1, end - start - 1);
 
-				vector.push_back({ name, type, length });
+				data_info.push_back({ name, type, length });
+
+				// Comma pos
+				size_t comma_pos = length.find(',');
+
+				if (comma_pos == std::string::npos) //NO ENCONTRADO
+					data_size.push_back(std::stoi(length));
+				else
+					data_size.push_back(std::stoi(length.substr(0, comma_pos)));
+
 			}
 		}
 
+		
+		for (auto i : data_size)
+			total_register_size += i + 1;
+
 		file.close();
-		return vector;
 	}
 
-	std::string read_data(std::string data_path, std::string meta_data_path)
+	std::string read_data(std::string data_path, std::string table_data_path)
 	{
 		std::ifstream file(data_path);
 		std::string line, data_line;
-		vector_data format_vector{ get_format(meta_data_path) };
+
+		get_format(table_data_path); // Update data_info
 
 		int line_counter{ 0 };
 
@@ -67,19 +84,20 @@ public:
 
 			// Fill empty item name with "WORD"
 			line = line.substr(0, line.find_first_of(',')) + ",WORD" + line.substr(line.find_last_of('"') + 1, line.size() - (line.find_last_of('"') + 1));
+			
 			// Erase spaces
 			line.erase(std::remove(line.begin(), line.end(), ' '), line.end());
-
+			
 
 			std::vector<std::string> row = get_row(line, ',');
 
-			int counter{ 0 };
+
 			for (int i = 0; i < row.size(); i++)
 			{
 
-				std::string& name{ format_vector[i][0] },
-					& type{ format_vector[i][1] },
-					& number{ format_vector[i][2] },
+				std::string& name{ data_info[i][0] },
+					& type{ data_info[i][1] },
+					& number{ data_info[i][2] },
 
 
 					& value{ row[i] };
@@ -134,9 +152,13 @@ public:
 						temp[i] = item[i];
 				}
 
-				data_line += temp + ',';
+				data_line += temp;
+				if (i != (row.size() - 1))
+					data_line += ',';
+					
 			}
-
+			line_counter++;
+			register_count++;
 			data_line += '/';
 		}
 
@@ -144,9 +166,33 @@ public:
 		return data_line;
 	}
 
-	void write_data(int in_sector_size)
+	void write_data(SectorIterator& iterator, std::string &data)
 	{
+		Disk& disk = iterator.disk;
 
+		for (int i = 0; i < register_count; i++)
+		{
+			if (disk.get_remnant_space() < total_register_size)
+			{
+				std::cerr << "NO HAY ESPACIO PAPITO\n";
+				return;
+			}
+
+			int lower = i * total_register_size,
+				upper = (i+1) * total_register_size;
+
+			for (int j = lower; j < upper; j++, iterator.next())
+				iterator.set_data(data[j]);
+		}
+	}
+
+	void debug()
+	{
+		show_data_info();
+		//std::cout << "\n\n";
+		show_data_size();
+		//std::cout << "\n\n";
+		std::cout << "REGISTROS: " << register_count << "\n";
 	}
 
 private:
@@ -161,6 +207,29 @@ private:
 
 		return row;
 	}
+
+	void show_data_info()
+	{
+		for (auto i : data_info)
+		{
+			for (auto j : i)
+				std::cout << j << "   ";
+			std::cout << "\n";
+		}
+	}
+
+	void show_data_size()
+	{
+		std::cout << "TOTAL: " << total_register_size << " - " << data_size.size() << " campos\n";
+		for (auto i : data_size)
+			std::cout << i << "   ";
+		std::cout << "\n";
+
+	}
+
+	vector_data data_info;
+	std::vector<int> data_size;
+	size_t total_register_size, register_count;
 };
 
 #endif

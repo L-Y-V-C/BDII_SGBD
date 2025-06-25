@@ -9,9 +9,14 @@ class Sector {
 public:
 	std::string data;
 	Sector() {}
-	Sector(int sectorSize, std::string in_data) {
-		data.resize(sectorSize);
-		data = in_data;
+	Sector(int sectorSize)
+	{
+		data.resize(sectorSize, '\0');
+	}
+
+	void print()
+	{
+		std::cout << data << "\n";
 	}
 };
 

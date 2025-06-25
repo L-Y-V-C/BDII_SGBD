@@ -5,11 +5,23 @@
 
 #include "surface.hh"
 
-class Plate {
+class Plate
+{
 public:
 	std::vector<Surface> surfaces;
-	Plate() {
-		surfaces.resize(2);
+	Plate(int in_track_number, int in_sector_number, int in_sector_size)
+	{
+		surfaces.resize(2, Surface(in_track_number, in_sector_number, in_sector_size));
+	}
+
+	void print()
+	{
+		for (auto i : surfaces)
+		{
+			std::cout << "SURFACE\n";
+			i.print();
+			std::cout << "SURFACE\n";
+		}	
 	}
 };
 
