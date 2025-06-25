@@ -5,12 +5,25 @@
 
 #include "track.hh"
 
-class Surface {
+class Surface
+{
 public:
 	std::vector<Track> tracks;
-	Surface(int surfaceNumbers) {
-		tracks.resize(surfaceNumbers);
+	Surface(int in_track_number, int in_sector_number, int in_sector_size)
+	{
+		tracks.resize(in_track_number, Track(in_sector_number, in_sector_size));
 	}
+
+	void print()
+	{
+		for (auto i : tracks)
+		{
+			std::cout << "TRACKS\n";
+			i.print();
+			std::cout << "TRACKS\n";
+		}
+	}
+	
 };
 
 #endif

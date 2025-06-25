@@ -3,16 +3,9 @@
 
 # ¡Exceptuar solo lo que quieres!
 !main.cpp
-!tree.hh
-!node.hh
-!disk.hh
-!dataReader.hh
-!plate.hh
-!surface.hh
-!track.hh
-!sector.hh
-!sectorIterator.hh
-
+!struct_table.txt
+!taxables.csv
+!*.hh
 # Excluir archivos comunes de Visual Studio que podrían estar en la raíz
 *.sln
 *.vcxproj
