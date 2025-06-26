@@ -40,6 +40,11 @@ public:
         }
     }
 
+    std::vector<size_t> get_position()
+    {
+        return std::vector<size_t>({ plateIndex, surfaceIndex, trackIndex, sectorIndex, char_index });
+    }
+
 private:
 
     size_t plateIndex,
