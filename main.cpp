@@ -2,10 +2,11 @@
 #include <string>
 
 #include "dataReader.hh"
+#include "queryManager.hh"
 
 int main()
 {
-    Disk test_disk(2, 10, 4,7);
+    Disk test_disk(4, 4, 8, 10);
     SectorIterator test_iterator(test_disk);
     DataReader test;
 
@@ -18,7 +19,6 @@ int main()
 
     test.debug();
 
-    
     std::cout << data_str << "\n\n\n\n\n\n\n";
 
     test.write_data(test_iterator, data_str);
@@ -27,5 +27,4 @@ int main()
     test.write_data_on_disk(disk_path,
                             data_str,
                             test_disk);
-
 }

@@ -4,6 +4,7 @@
 #pragma once
 
 #include <string>
+#include <iostream>
 
 class Sector {
 public:
