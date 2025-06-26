@@ -1,15 +1,13 @@
-#ifndef SECTORITERATOR_HH
-#define SECTORITERATOR_HH
 #pragma once
 
 #include "disk.hh"
 
-class SectorIterator
+class DiskManager
 {
 public:
     Disk& disk;
 
-    SectorIterator(Disk& d) :
+    DiskManager(Disk& d) :
         disk(d), plateIndex(0), surfaceIndex(0), trackIndex(0), sectorIndex(0), char_index(0)
     {
         advanceToNextValid();
@@ -93,10 +91,8 @@ private:
         }
     }
 
-    bool is_disk_full() const // Disk is full
+    bool is_disk_full() const
     {
         return plateIndex >= disk.plates.size();
     }
 };
-
-#endif
