@@ -3,7 +3,8 @@
 #include <string>
 #include <vector>
 
-class Register {
+class Register
+{
 public:
     std::vector<std::string> fields;
 

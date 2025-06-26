@@ -1,98 +1,27 @@
 #pragma once
 
 #include "disk.hh"
+#include "diskIterator.hh"
 
 class DiskManager
 {
 public:
-    Disk& disk;
 
     DiskManager(Disk& d) :
-        disk(d), plateIndex(0), surfaceIndex(0), trackIndex(0), sectorIndex(0), char_index(0)
-    {
-        advanceToNextValid();
-    }
+        disk(d), iterator(d)
+    { }
 
-    void next()
-    {
-        if (is_disk_full())
-            return;
+    void next() { iterator.next(); }
 
-        char_index++;
-        disk.current_char_pos++;
-        advanceToNextValid();
-    }
+    char& current_char() { return iterator.current_char(); }
 
-    char& current_char()
-    {
-        return disk.plates[plateIndex].surfaces[surfaceIndex]
-            .tracks[trackIndex].sectors[sectorIndex].data[char_index];
-    }
+    void set_data(char in_char) { iterator.set_data(in_char); }
 
-    void set_data(char in_char)
-    {
-        if (!is_disk_full())
-        {
-            char &a = current_char();
-            a = in_char;
-        }
-    }
+    std::vector<size_t> get_position() { return iterator.get_position(); }
 
-    std::vector<size_t> get_position()
-    {
-        return std::vector<size_t>({ plateIndex, surfaceIndex, trackIndex, sectorIndex, char_index });
-    }
+    Disk& get_disk() { return disk; }
 
 private:
-
-    size_t plateIndex,
-           surfaceIndex,
-           trackIndex,
-           sectorIndex,
-           char_index;
-
-    void advanceToNextValid()
-    {
-        while (plateIndex < disk.plates.size())
-        {
-            Plate& plate = disk.plates[plateIndex];
-            if (surfaceIndex >= plate.surfaces.size())
-            {
-                plateIndex++;
-                surfaceIndex = 0;
-                trackIndex = 0;
-                sectorIndex = 0;
-                continue;
-            }
-            auto& surface = plate.surfaces[surfaceIndex];
-            if (trackIndex >= surface.tracks.size())
-            {
-                surfaceIndex++;
-                trackIndex = 0;
-                sectorIndex = 0;
-                continue;
-            }
-            auto& track = surface.tracks[trackIndex];
-            if (sectorIndex >= track.sectors.size())
-            {
-                trackIndex++;
-                sectorIndex = 0;
-                continue;
-            }
-
-            auto& sector = track.sectors[sectorIndex];
-            if (char_index >= sector.data.size())
-            {
-                char_index = 0;
-                sectorIndex++;
-                continue;
-            }
-            return;
-        }
-    }
-
-    bool is_disk_full() const
-    {
-        return plateIndex >= disk.plates.size();
-    }
+    Disk& disk;
+    DiskIterator iterator;
 };

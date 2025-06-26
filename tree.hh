@@ -14,11 +14,13 @@ struct AVLTree {
         return res;
     }
 
-    std::string convert(const T& data) {
-        if (field == 2 || field == 3 || field == 4) {
+    std::string convert(const T& data)
+    {
+        if (field == 2 || field == 3 || field == 4)
+        {
             float valor = std::stof(data[field]);
             std::ostringstream ss;
-            ss << std::setw(8) << std::setfill('0') << std::fixed << std::setprecision(2) << valor;
+            ss << std::setw(10) << std::setfill('0') << std::fixed << std::setprecision(2) << valor;
             return ss.str();
         }
         if (field == 1)
