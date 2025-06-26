@@ -2,11 +2,13 @@
 
 template<class T>
 struct Nodo {
-    T data;
-    Nodo<T>* nodos[2];
+    std::string clave; 
+    std::vector<T> registros;
+    Nodo* nodos[2];
     int height;
 
-    Nodo(const T& val) : data(val), height(1) {
+    Nodo(const std::string& clave_, const T& val) : clave(clave_), height(1) {
+        registros.push_back(val);
         nodos[0] = nodos[1] = nullptr;
     }
 };

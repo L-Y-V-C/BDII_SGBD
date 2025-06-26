@@ -1,31 +1,34 @@
 #include <iostream>
+#include <vector>
 #include <string>
+#include <algorithm>
+#include <cctype>
+#include <iomanip>
+#include <sstream>
 
-#include "dataReader.hh"
-
-int main()
-{
-    Disk test_disk(2, 10, 4,7);
-    SectorIterator test_iterator(test_disk);
-    DataReader test;
+#include "listRegister.hh"
+#include "register.hh"
+#include "interface.hh"
 
 
-    std::string data_path("data_test.csv"),
-                table_data_path("table_data.csv"),
-                disk_path("disk.txt");
+int main() {
+    std::vector<std::string> columnas = { "Index", "Item", "Cost", "Tax", "Total" };
 
-    std::string data_str = test.read_data(data_path, table_data_path);
+    ListRegister tabla(columnas);
 
-    test.debug();
+    tabla.add({ "1", "Apple", "1.20", "0.10", "1.30" });
+    tabla.add({ "2", "Banana", "0.80", "0.05", "0.85" });
+    tabla.add({ "3", "Orange", "1.00", "0.08", "1.08" });
 
-    
-    std::cout << data_str << "\n\n\n\n\n\n\n";
-
-    test.write_data(test_iterator, data_str);
-    test_disk.print_disk();
-
-    test.write_data_on_disk(disk_path,
-                            data_str,
-                            test_disk);
-
+    // Imprimir
+    tabla.print();
 }
+
+
+/*
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow) {
+    App app;
+    app.Run(hInstance, nCmdShow);
+    return 0;
+}
+*/
