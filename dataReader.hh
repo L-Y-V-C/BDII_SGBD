@@ -54,8 +54,14 @@ public:
 		}
 
 		
-		for (auto i : data_size)
-			total_register_size += i + 1;
+		for (int i = 0; i < data_info.size(); i++)
+		{
+			total_register_size += data_size[i] + 1;
+
+			if (data_info[i][1] == "DECIMAL") // Because of the extra point, decimal requires
+				total_register_size++;
+
+		}	
 
 		file.close();
 	}
@@ -199,13 +205,23 @@ public:
 		file.close();
 	}
 
-	void write_data(SectorIterator& iterator, std::string &data)
+	void write_data(SectorIterator& iterator, std::string &data, std::string meta_data_path)
 	{
+		std::ofstream file(meta_data_path);
+
+		if (!file.is_open())
+		{
+			std::cerr << "Error al abrir el archivo " << meta_data_path << '\n';
+			return;
+		}
+
 		Disk& disk = iterator.disk;
 		int sector_size{ disk.get_sector_size() };
 		int maximum_registers = disk.get_remnant_space() / total_register_size;
 
 
+
+		int counter{ 0 };
 		for (int i = 0; i < register_count; i++)
 		{
 			if (i >= maximum_registers)
@@ -217,8 +233,34 @@ public:
 			int lower = i * total_register_size,
 				upper = (i+1) * total_register_size;
 
-			for (int j = lower; j < upper; j++, iterator.next())
+			std::string sub_str = data.substr(lower, upper);
+
+			int register_id = std::stoi(sub_str.substr(0, sub_str.find(',')));
+
+
+			// Save positions, before and after inserting a register
+			std::vector<size_t> initial_pos = iterator.get_position();
+
+			for (int j = lower; j < upper; j++, iterator.next(), counter++)
 				iterator.set_data(data[j]);
+
+			std::vector<size_t> final_pos = iterator.get_position();
+
+
+			// Save meta data
+			file << register_id << " ";
+			for (auto i : initial_pos)
+				file << i << " ";
+			
+			for (int i = 0; i < final_pos.size(); i++)
+			{
+				file << final_pos[i];
+				if (i == final_pos.size() - 1)
+					file << "\n";
+				else
+					file << " ";
+			}
+
 		}
 	}
 
