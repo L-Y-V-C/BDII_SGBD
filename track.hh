@@ -16,11 +16,9 @@ public:
 
 	void print()
 	{
-		for (auto i : sectors)
+		for (int i = 0; i < sectors.size(); i++)
 		{
-			std::cout << "SECTORS\n";
-			i.print();
-			std::cout << "sectors\n";
+			sectors[i].print();
 		}
 	}
 };
