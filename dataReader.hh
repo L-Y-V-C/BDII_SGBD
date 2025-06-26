@@ -86,8 +86,6 @@ public:
 			size_t second_quote = line.find_last_of('"');
 			item = line.substr(first_quote + 1, second_quote - first_quote - 1);
 
-
-
 			// Fill empty item name with "WORD"
 			line = line.substr(0, line.find_first_of(',')) + ",WORD" + line.substr(line.find_last_of('"') + 1, line.size() - (line.find_last_of('"') + 1));
 			
