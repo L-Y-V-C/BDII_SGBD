@@ -8,7 +8,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
-#include "sectorIterator.hh"
+#include "diskManager.hh"
 
 
 class DataReader
@@ -54,8 +54,14 @@ public:
 		}
 
 		
-		for (auto i : data_size)
-			total_register_size += i + 1;
+		for (int i = 0; i < data_info.size(); i++)
+		{
+			total_register_size += data_size[i] + 1;
+
+			if (data_info[i][1] == "DECIMAL") // Because of the extra point, decimal requires
+				total_register_size++;
+
+		}	
 
 		file.close();
 	}
@@ -80,8 +86,6 @@ public:
 			size_t second_quote = line.find_last_of('"');
 			item = line.substr(first_quote + 1, second_quote - first_quote - 1);
 
-
-
 			// Fill empty item name with "WORD"
 			line = line.substr(0, line.find_first_of(',')) + ",WORD" + line.substr(line.find_last_of('"') + 1, line.size() - (line.find_last_of('"') + 1));
 			
@@ -98,11 +102,7 @@ public:
 				std::string& name{ data_info[i][0] },
 					& type{ data_info[i][1] },
 					& number{ data_info[i][2] },
-
-
 					& value{ row[i] };
-
-
 
 				std::string temp;
 
@@ -199,13 +199,23 @@ public:
 		file.close();
 	}
 
-	void write_data(SectorIterator& iterator, std::string &data)
+	void write_data(DiskManager& iterator, std::string &data, std::string meta_data_path)
 	{
+		std::ofstream file(meta_data_path);
+
+		if (!file.is_open())
+		{
+			std::cerr << "Error al abrir el archivo " << meta_data_path << '\n';
+			return;
+		}
+
 		Disk& disk = iterator.disk;
 		int sector_size{ disk.get_sector_size() };
 		int maximum_registers = disk.get_remnant_space() / total_register_size;
 
 
+
+		int counter{ 0 };
 		for (int i = 0; i < register_count; i++)
 		{
 			if (i >= maximum_registers)
@@ -217,9 +227,82 @@ public:
 			int lower = i * total_register_size,
 				upper = (i+1) * total_register_size;
 
-			for (int j = lower; j < upper; j++, iterator.next())
+			std::string sub_str = data.substr(lower, upper);
+
+			int register_id = std::stoi(sub_str.substr(0, sub_str.find(',')));
+
+
+			// Save positions, before and after inserting a register
+			std::vector<size_t> initial_pos = iterator.get_position();
+
+			for (int j = lower; j < upper; j++, iterator.next(), counter++)
 				iterator.set_data(data[j]);
+
+			std::vector<size_t> final_pos = iterator.get_position();
+
+
+			// Save meta data
+			file << register_id << " ";
+			for (auto i : initial_pos)
+				file << i << " ";
+			
+			for (int i = 0; i < final_pos.size(); i++)
+			{
+				file << final_pos[i];
+				if (i == final_pos.size() - 1)
+					file << "\n";
+				else
+					file << " ";
+			}
+
 		}
+	}
+	// extract data from metadata file
+	std::vector<std::vector<std::string>> read_meta_data(std::string meta_data_path, std::vector<int> in_ids)
+	{
+		std::ifstream file(meta_data_path);
+		std::string line;
+		std::vector<std::vector<std::string>> results;
+		while (std::getline(file, line)) {
+			std::istringstream iss(line);
+			std::string id_str;
+			if (!(iss >> id_str))
+				continue;
+			int id_int = std::stoi(id_str);
+
+			if (std::find(in_ids.begin(), in_ids.end(), id_int) != in_ids.end())
+			{
+				std::vector<std::string> result;
+				result.push_back(id_str); // first
+
+				std::string token;
+				while (iss >> token) {
+					result.push_back(token);
+				}
+				results.push_back(result);
+			}
+		}
+		return results;
+	}
+
+	std::vector<int> extractSizes()
+	{
+		std::vector<int> sizes;
+		std::string tmp;
+		int sizeInt;
+		for (auto x : data_info) {
+			tmp = x[2];
+			if (x[1] == "DECIMAL") {
+				size_t pos = tmp.find(',');
+				tmp = (pos != std::string::npos) ? tmp.substr(0, pos) : tmp;
+				sizeInt = std::stoi(tmp) + 1;
+			}
+			else {
+				sizeInt = std::stoi(tmp);
+			}
+			sizes.push_back(sizeInt);
+		}
+		return sizes;
 	}
 
 	void debug()
@@ -262,7 +345,7 @@ private:
 		std::cout << "\n";
 
 	}
-
+public:
 	vector_data data_info;
 	std::vector<int> data_size;
 	size_t total_register_size, register_count;

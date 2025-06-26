@@ -1,4 +1,5 @@
 #pragma once
+
 #include "node.hh"
 
 template<class T>
@@ -164,4 +165,12 @@ struct AVLTree {
         mostrarRegistrosPorNodo(n->nodos[1]);
     }
 
+
+    bool find(const T& val, Node**& pPos) {
+        pPos = &root;
+        while (*pPos && (*pPos)->data != val) {
+            pPos = &((*pPos)->nodos[(*pPos)->data < val]);
+        }
+        return *pPos != 0;
+    }
 };
