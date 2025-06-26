@@ -29,7 +29,7 @@ public:
         }
     }
 
-    void printTokens() const {
+    void printTokens() {
         for (std::string t : tokens) {
             std::cout << t << "\n";
         }
