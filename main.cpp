@@ -1,5 +1,14 @@
 #include <iostream>
+#include <vector>
 #include <string>
+#include <algorithm>
+#include <cctype>
+#include <iomanip>
+#include <sstream>
+
+#include "listRegister.hh"
+#include "register.hh"
+#include "interface.hh"
 
 #include "dataReader.hh"
 #include "queryManager.hh"
@@ -10,7 +19,6 @@ int main()
     Disk test_disk(4, 4, 8, 20);
     DiskManager testDiskManager(test_disk);
     DataReader testDataReader;
-
 
     std::string data_path("data_test.csv"),
                 table_data_path("table_data.csv"),

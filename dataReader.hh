@@ -15,7 +15,7 @@ class DataReader
 {
 public:
 
-	using vector_data = std::vector< std::vector <std::string>>;
+	using vector_data = std::vector< std::vector<std::string> >;
 
 	DataReader():
 		data_info(), data_size(), total_register_size(0), register_count(0) { }
