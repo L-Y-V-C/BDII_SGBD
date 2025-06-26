@@ -16,11 +16,9 @@ public:
 
 	void print()
 	{
-		for (auto i : surfaces)
+		for (int i = 0; i < surfaces.size(); i++)
 		{
-			std::cout << "SURFACE\n";
-			i.print();
-			std::cout << "SURFACE\n";
+			surfaces[i].print();
 		}	
 	}
 };

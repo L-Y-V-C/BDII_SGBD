@@ -16,11 +16,9 @@ public:
 
 	void print()
 	{
-		for (auto i : tracks)
+		for (int i = 0; i < tracks.size(); i++)
 		{
-			std::cout << "TRACKS\n";
-			i.print();
-			std::cout << "TRACKS\n";
+			tracks[i].print();
 		}
 	}
 	
