@@ -5,14 +5,16 @@
 
 int main()
 {
-    Disk test_disk(2, 3, 3, 10);
+    Disk test_disk(2, 10, 4,7);
     SectorIterator test_iterator(test_disk);
     DataReader test;
 
-    
 
-    std::string data_str = test.read_data("C:\\Users\\diego\\OneDrive\\Escritorio\\bd_data\\data_test.csv",
-        "C:\\Users\\diego\\OneDrive\\Escritorio\\bd_data\\table_data.csv");
+    std::string data_path("data_test.csv"),
+                table_data_path("table_data.csv"),
+                disk_path("disk.txt");
+
+    std::string data_str = test.read_data(data_path, table_data_path);
 
     test.debug();
 
@@ -21,5 +23,9 @@ int main()
 
     test.write_data(test_iterator, data_str);
     test_disk.print_disk();
+
+    test.write_data_on_disk(disk_path,
+                            data_str,
+                            test_disk);
 
 }

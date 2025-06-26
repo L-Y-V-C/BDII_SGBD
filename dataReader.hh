@@ -166,15 +166,51 @@ public:
 		return data_line;
 	}
 
+	void write_data_on_disk(std::string disk_path, std::string& data, Disk &disk)
+	{
+		std::ofstream file(disk_path);
+
+		if (!file.is_open())
+		{
+			std::cerr << "Error al abrir el archivo " << disk_path << '\n';
+			return;
+		}
+
+
+		int sector_size{ disk.get_sector_size() };
+		int maximum_registers = disk.get_remnant_space() / total_register_size;
+		
+		int current_registers{ 0 };
+		for (int i = 0; i < data.size(); i++)
+		{
+			if (current_registers >= maximum_registers)
+			{
+				std::cerr << "No se pudieron escribir todos los registros!, escrito hasta el registro: " << current_registers << "\n";
+
+				return;
+			}
+			if ((i % total_register_size == 0) && i > 0)
+				current_registers++;
+			if ((i % sector_size == 0) && i > 0)
+				file << "\n";
+			file << data[i];
+		}
+
+		file.close();
+	}
+
 	void write_data(SectorIterator& iterator, std::string &data)
 	{
 		Disk& disk = iterator.disk;
+		int sector_size{ disk.get_sector_size() };
+		int maximum_registers = disk.get_remnant_space() / total_register_size;
+
 
 		for (int i = 0; i < register_count; i++)
 		{
-			if (disk.get_remnant_space() < total_register_size)
+			if (i >= maximum_registers)
 			{
-				std::cerr << "NO HAY ESPACIO PAPITO\n";
+				std::cerr << "No se pudieron escribir todos los registros!, escrito hasta el registro: " << i << "\n";
 				return;
 			}
 

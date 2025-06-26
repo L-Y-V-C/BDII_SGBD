@@ -26,17 +26,13 @@ public:
 
 	void print_disk()
 	{
-		for (auto i : plates)
+		for (int i = 0; i < plates.size(); i++)
 		{
-			std::cout << "PLATE\n";
-			i.print();
-			std::cout << "PLATE\n";
+			plates[i].print();
 		}
-			
-
-
 	}
 
+	int get_sector_size() { return sector_size; }
 private:
 	int plate_number, track_number, sector_number, sector_size;
 	size_t total_space;
