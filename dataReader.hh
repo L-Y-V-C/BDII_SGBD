@@ -8,7 +8,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
-#include "sectorIterator.hh"
+#include "diskManager.hh"
 
 
 class DataReader
@@ -86,8 +86,6 @@ public:
 			size_t second_quote = line.find_last_of('"');
 			item = line.substr(first_quote + 1, second_quote - first_quote - 1);
 
-
-
 			// Fill empty item name with "WORD"
 			line = line.substr(0, line.find_first_of(',')) + ",WORD" + line.substr(line.find_last_of('"') + 1, line.size() - (line.find_last_of('"') + 1));
 			
@@ -104,11 +102,7 @@ public:
 				std::string& name{ data_info[i][0] },
 					& type{ data_info[i][1] },
 					& number{ data_info[i][2] },
-
-
 					& value{ row[i] };
-
-
 
 				std::string temp;
 
@@ -205,7 +199,7 @@ public:
 		file.close();
 	}
 
-	void write_data(SectorIterator& iterator, std::string &data, std::string meta_data_path)
+	void write_data(DiskManager& iterator, std::string &data, std::string meta_data_path)
 	{
 		std::ofstream file(meta_data_path);
 
@@ -263,6 +257,53 @@ public:
 
 		}
 	}
+	// extract data from metadata file
+	std::vector<std::vector<std::string>> read_meta_data(std::string meta_data_path, std::vector<int> in_ids)
+	{
+		std::ifstream file(meta_data_path);
+		std::string line;
+		std::vector<std::vector<std::string>> results;
+		while (std::getline(file, line)) {
+			std::istringstream iss(line);
+			std::string id_str;
+			if (!(iss >> id_str))
+				continue;
+			int id_int = std::stoi(id_str);
+
+			if (std::find(in_ids.begin(), in_ids.end(), id_int) != in_ids.end())
+			{
+				std::vector<std::string> result;
+				result.push_back(id_str); // first
+
+				std::string token;
+				while (iss >> token) {
+					result.push_back(token);
+				}
+				results.push_back(result);
+			}
+		}
+		return results;
+	}
+
+	std::vector<int> extractSizes()
+	{
+		std::vector<int> sizes;
+		std::string tmp;
+		int sizeInt;
+		for (auto x : data_info) {
+			tmp = x[2];
+			if (x[1] == "DECIMAL") {
+				size_t pos = tmp.find(',');
+				tmp = (pos != std::string::npos) ? tmp.substr(0, pos) : tmp;
+				sizeInt = std::stoi(tmp) + 1;
+			}
+			else {
+				sizeInt = std::stoi(tmp);
+			}
+			sizes.push_back(sizeInt);
+		}
+		return sizes;
+	}
 
 	void debug()
 	{
@@ -304,7 +345,7 @@ private:
 		std::cout << "\n";
 
 	}
-
+public:
 	vector_data data_info;
 	std::vector<int> data_size;
 	size_t total_register_size, register_count;
