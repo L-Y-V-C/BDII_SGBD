@@ -25,7 +25,7 @@ public:
             parseInsert(trimmed);
         }
         else {
-            std::cerr << "Unsupported query type.\n";
+            std::cerr << "tipo de query no soportado\n";
         }
     }
 
