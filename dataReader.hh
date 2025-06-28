@@ -15,7 +15,7 @@ class DataReader
 {
 public:
 
-	using vector_data = std::vector< std::vector <std::string>>;
+	using vector_data = std::vector< std::vector<std::string> >;
 
 	DataReader():
 		data_info(), data_size(), total_register_size(0), register_count(0) { }
@@ -47,21 +47,20 @@ public:
 
 				if (comma_pos == std::string::npos) //NO ENCONTRADO
 					data_size.push_back(std::stoi(length));
-				else
+				else // Decimal
+				{
 					data_size.push_back(std::stoi(length.substr(0, comma_pos)));
+					data_size.back()++;
+				}
+					
 
 			}
 		}
 
 		
 		for (int i = 0; i < data_info.size(); i++)
-		{
 			total_register_size += data_size[i] + 1;
 
-			if (data_info[i][1] == "DECIMAL") // Because of the extra point, decimal requires
-				total_register_size++;
-
-		}	
 
 		file.close();
 	}
@@ -166,7 +165,7 @@ public:
 		return data_line;
 	}
 
-	void write_data_on_disk(std::string disk_path, std::string& data, Disk &disk)
+	void write_data_on_txt(std::string disk_path, std::string& data, Disk &disk)
 	{
 		std::ofstream file(disk_path);
 
@@ -209,10 +208,9 @@ public:
 			return;
 		}
 
-		Disk& disk = iterator.disk;
+		Disk& disk = iterator.get_disk();
 		int sector_size{ disk.get_sector_size() };
 		int maximum_registers = disk.get_remnant_space() / total_register_size;
-
 
 
 		int counter{ 0 };
@@ -257,6 +255,7 @@ public:
 
 		}
 	}
+	
 	// extract data from metadata file
 	std::vector<std::vector<std::string>> read_meta_data(std::string meta_data_path, std::vector<int> in_ids)
 	{
@@ -285,25 +284,7 @@ public:
 		return results;
 	}
 
-	std::vector<int> extractSizes()
-	{
-		std::vector<int> sizes;
-		std::string tmp;
-		int sizeInt;
-		for (auto x : data_info) {
-			tmp = x[2];
-			if (x[1] == "DECIMAL") {
-				size_t pos = tmp.find(',');
-				tmp = (pos != std::string::npos) ? tmp.substr(0, pos) : tmp;
-				sizeInt = std::stoi(tmp) + 1;
-			}
-			else {
-				sizeInt = std::stoi(tmp);
-			}
-			sizes.push_back(sizeInt);
-		}
-		return sizes;
-	}
+	std::vector<int> get_field_size() { return data_size; }
 
 	void debug()
 	{
@@ -313,6 +294,8 @@ public:
 		//std::cout << "\n\n";
 		std::cout << "REGISTROS: " << register_count << "\n";
 	}
+
+	size_t get_register_size() { return total_register_size; }
 
 private:
 	std::vector<std::string> get_row(std::string& line, char delimiter = ',')
