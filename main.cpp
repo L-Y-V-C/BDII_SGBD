@@ -29,7 +29,7 @@ int main()
     
     std::string data_str = dataReader.read_data(data_path, table_data_path);
 
-    //dataReader.debug();
+    //
 
      std::cout << data_str << "\n\n";
 
@@ -75,4 +75,8 @@ int main()
 
     std::cout << "Registros encontrados:\n";
     print_table(query_separated, 50);
+
+    printf("\n");
+    //dataReader.debug();
+    
 }
