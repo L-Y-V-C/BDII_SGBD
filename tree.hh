@@ -1,6 +1,7 @@
 #pragma once
 
 #include "node.hh"
+#include <iomanip>
 
 template<class T>
 struct AVLTree {
