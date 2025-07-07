@@ -26,12 +26,12 @@ int main()
                 table_data_path("table_data.csv"),
                 disk_path("disk.txt"),
                 meta_data_path("meta_data.txt");
-    
+   
+
     std::string data_str = dataReader.read_data(data_path, table_data_path);
-
-    //
-
-     std::cout << data_str << "\n\n";
+    
+    std::cout << "Tabla: " << dataReader.table_name << "\n\n";
+    std::cout << data_str << "\n\n";
 
     dataReader.write_data(diskManager, data_str, meta_data_path);
     dataReader.write_data_on_txt(
@@ -62,7 +62,7 @@ int main()
     std::cout << "\n";
 
    
-    /* TEST PRUEBA EXTRACION DE REGISTROS DE METADATA */
+    // TEST PRUEBA EXTRACION DE REGISTROS DE METADATA
     DiskIterator disk_iterator(disk, dataReader.get_register_size());  // , dataReader.get_field_size());
 
     std::vector<std::string> answer_query;
@@ -77,6 +77,6 @@ int main()
     print_table(query_separated, 50);
 
     printf("\n");
-    //dataReader.debug();
     
+    //dataReader.debug();
 }
