@@ -1,179 +1,170 @@
 #pragma once
 
+#include <iostream>
+#include <string>
+
 #include "node.hh"
 #include <iomanip>
 
-template<class T>
-struct AVLTree {
-    Nodo<T>* root = nullptr;
-    int field = 0;
+class AVLTree {
+public:
+    Node* root;
+    int compType; /*0 int - 1 float - 2 string*/
 
-    std::string convertLowercast(const std::string& s) {
-        std::string res = s;
-        for (char& c : res)
-            c = std::tolower(static_cast<unsigned char>(c));
-        return res;
-    }
-
-    std::string convert(const T& data)
-    {
-        if (field == 2 || field == 3 || field == 4)
-        {
-            float valor = std::stof(data[field]);
-            std::ostringstream ss;
-            ss << std::setw(10) << std::setfill('0') << std::fixed << std::setprecision(2) << valor;
-            return ss.str();
-        }
-        if (field == 1)
-            return convertLowercast(data[field]);
-        return data[field];
-    }
-
-    int height(Nodo<T>* n) {
-        return n ? n->height : 0;
-    }
-
-    int balanceFactor(Nodo<T>* n) {
-        return n ? height(n->nodos[1]) - height(n->nodos[0]) : 0;
-    }
-
-    bool sort(int num) {
-        return num == 2 || num == -2;
-    }
-
-    void rrRotate(Nodo<T>** a_temp) {
-        Nodo<T>* b_temp = (*a_temp)->nodos[1];
-
-        (*a_temp)->height -= 2;
-
-        (*a_temp)->nodos[1] = b_temp->nodos[0];
-        b_temp->nodos[0] = *a_temp;
-
-        *a_temp = b_temp;
-    }
-
-    void rlRotate(Nodo<T>** a_temp) {
-        Nodo<T>* c_temp = (*a_temp)->nodos[1];
-        Nodo<T>* b_temp = c_temp->nodos[0];
-
-        (*a_temp)->height -= 2;
-        b_temp->height += 1;
-        c_temp->height -= 1;
-
-        (*a_temp)->nodos[1] = b_temp->nodos[0];
-        c_temp->nodos[0] = b_temp->nodos[1];
-        b_temp->nodos[0] = *a_temp;
-        b_temp->nodos[1] = c_temp;
-
-        *a_temp = b_temp;
-    }
-
-    void llRotate(Nodo<T>** c_temp) {
-        Nodo<T>* b_temp = (*c_temp)->nodos[0];
-
-        (*c_temp)->height -= 2;
-
-        (*c_temp)->nodos[0] = b_temp->nodos[1];
-        b_temp->nodos[1] = (*c_temp);
-
-        *c_temp = b_temp;
-    }
-
-    void lrRotate(Nodo<T>** c_temp) {
-        Nodo<T>* a_temp = (*c_temp)->nodos[0];
-        Nodo<T>* b_temp = a_temp->nodos[1];
-
-        (*c_temp)->height -= 2;
-        b_temp->height += 1;
-        a_temp->height -= 1;
-
-        a_temp->nodos[1] = b_temp->nodos[0];
-        (*c_temp)->nodos[0] = b_temp->nodos[1];
-        b_temp->nodos[0] = a_temp;
-        b_temp->nodos[1] = *c_temp;
-
-        *c_temp = b_temp;
-    }
-
-    Nodo<T>* insert(const T& val, Nodo<T>** n) {
-        std::string clave = convert(val);
-
-        if (!root) {
-            root = new Nodo<T>(clave, val);
-            return root;
-        }
-
-        if (!(*n)) return new Nodo<T>(clave, val);
-
-        if (clave < (*n)->clave)
-            (*n)->nodos[0] = insert(val, &((*n)->nodos[0]));
-        else if (clave > (*n)->clave)
-            (*n)->nodos[1] = insert(val, &((*n)->nodos[1]));
-        else {
-            (*n)->registros.push_back(val);
-            return *n;
-        }
-
-        (*n)->height = std::max(height((*n)->nodos[0]), height((*n)->nodos[1])) + 1;
-        int diff_height = balanceFactor(*n);
-
-        if (sort(diff_height)) {
-            if (diff_height < 0) {
-                if ((*n)->nodos[0] && clave < (*n)->nodos[0]->clave)
-                    llRotate(n);
-                else
-                    lrRotate(n);
-            }
-            else {
-                if ((*n)->nodos[1] && clave > (*n)->nodos[1]->clave)
-                    rrRotate(n);
-                else
-                    rlRotate(n);
-            }
-        }
-
-        return *n;
-    }
-
-    void inorder(Nodo<T>* n) {
-        if (!n) return;
-        inorder(n->nodos[0]);
-        for (const auto& r : n->registros)
-            std::cout << r[field] << "   |  ";
-        inorder(n->nodos[1]);
-    }
-
-    void inorder2(Nodo<T>* n) {
-        if (!n) return;
-        inorder2(n->nodos[0]);
-        for (const auto& r : n->registros)
-            std::cout << "[" << r[0] << "] " << r[1] << " = " << r[field] << "\n";
-        inorder2(n->nodos[1]);
-    }
-    void mostrarRegistrosPorNodo(Nodo<T>* n) {
-        if (!n) return;
-        mostrarRegistrosPorNodo(n->nodos[0]);
-
-        std::cout << "Clave: " << n->clave << "\n";
-        for (const auto& r : n->registros) {
-            std::cout << "  [";
-            for (size_t i = 0; i < r.size(); ++i) {
-                std::cout << r[i];
-                if (i < r.size() - 1) std::cout << ", ";
-            }
-            std::cout << "]\n";
-        }
-        std::cout << "\n";
-
-        mostrarRegistrosPorNodo(n->nodos[1]);
-    }
-
-
-    bool find(const T& val, Node**& pPos) {
-        pPos = &root;
-        while (*pPos && (*pPos)->data != val) {
-            pPos = &((*pPos)->nodos[(*pPos)->data < val]);
-        }
-        return *pPos != 0;
-    }
+    AVLTree(int in_type) : root(0), compType(in_type) {}
+    int height(Node* node);
+    int balanceFactor(Node* node);
+    Node* rightRotate(Node* y);
+    Node* leftRotate(Node* x);
+    Node* insert(Node* node, Value inValue);
+    Node* minValueNode(Node* node);
+    bool find(Node* root, Value inValue);
+    void insert(Value inValue);
+    bool find(Value inValue);
+    int compare(Node* node, Value inValue);
+    void printTree(Node* node, int space);
 };
+
+int AVLTree::height(Node* node) {
+    if (!node)
+        return 0;
+    return node->height;
+}
+
+int AVLTree::balanceFactor(Node* node) {
+    if (node == nullptr)
+        return 0;
+    return height(node->left) - height(node->right);
+}
+
+Node* AVLTree::rightRotate(Node* y) {
+    Node* x = y->left;
+    Node* T2 = x->right;
+    /*rotation*/
+    x->right = y;
+    y->left = T2;
+    /*height fix*/
+    y->height = max(height(y->left), height(y->right)) + 1;
+    x->height = max(height(x->left), height(x->right)) + 1;
+    return x;/*new root*/
+}
+
+Node* AVLTree::leftRotate(Node* x) {
+    Node* y = x->right;
+    Node* T2 = y->left;
+    /*rotation*/
+    y->left = x;
+    x->right = T2;
+    /*height fix*/
+    x->height = max(height(x->left), height(x->right)) + 1;
+    y->height = max(height(y->left), height(y->right)) + 1;
+    return y;/*new root*/
+}
+int AVLTree::compare(Node* node, Value inValue) {
+    switch (compType) {
+    case 0:
+        if (inValue.datInt < node->val.datInt)
+            return 0;
+        else if (inValue.datInt > node->val.datInt)
+            return 1;
+        else
+            return 2;
+        break;
+    case 1:
+        if (inValue.datFloat < node->val.datFloat)
+            return 0;
+        else if (inValue.datFloat > node->val.datFloat)
+            return 1;
+        else
+            return 2;
+        break;
+    case 2:
+        if (inValue.datString < node->val.datString)
+            return 0;
+        else if (inValue.datString > node->val.datString)
+            return 1;
+        else
+            return 2;
+        break;
+    }
+}
+
+Node* AVLTree::insert(Node* node, Value inValue) {
+    if (!node)
+        return new Node(inValue);
+    if (compare(node, inValue) == 0)
+        node->left = insert(node->left, inValue);
+    else if (compare(node, inValue) == 1)
+        node->right = insert(node->right, inValue);
+    else if (compare(node, inValue) == 2)
+        return node;
+    /*height ancestor update*/
+    node->height = 1 + max(height(node->left), height(node->right));
+    int balance = balanceFactor(node);
+    /*cases*/
+    //LL
+    if (balance > 1 && compare(node->left, inValue) == 0)
+        return rightRotate(node);
+    //RR
+    if (balance < -1 && compare(node->right, inValue) == 1)
+        return leftRotate(node);
+    //LR
+    if (balance > 1 && compare(node->left, inValue) == 1) {
+        node->left = leftRotate(node->left);
+        return rightRotate(node);
+    }
+    //RL
+    if (balance < -1 && compare(node->right, inValue) == 0) {
+        node->right = rightRotate(node->right);
+        return leftRotate(node);
+    }
+    return node;
+}
+
+Node* AVLTree::minValueNode(Node* node) {
+    Node* current = node;
+    while (current->left)
+        current = current->left;
+    return current;
+}
+
+bool AVLTree::find(Node* root, Value inValue) {
+    if (root == nullptr)
+        return false;
+    if (compare(root, inValue) == 2)
+        return true;
+    if (compare(root, inValue) == 0)
+        return find(root->left, inValue);
+    return find(root->right, inValue);
+}
+
+void AVLTree::insert(Value inValue) {
+    root = insert(root, inValue);
+}
+
+bool AVLTree::find(Value inValue) {
+    return find(root, inValue);
+}
+
+void AVLTree::printTree(Node* node, int space = 0) {
+    if (node == nullptr)
+        return;
+    space += 4;
+    printTree(node->right, space);
+    std::cout << std::endl;
+    for (int i = 4; i < space; i++)
+        std::cout << " ";
+    switch (compType) {
+    case 0:
+        std::cout << node->val.datInt;
+        break;
+    case 1:
+        std::cout << node->val.datFloat;
+        break;
+    case 2:
+        std::cout << node->val.datString;
+        break;
+    }
+    std::cout << std::endl;
+    printTree(node->left, space);
+}

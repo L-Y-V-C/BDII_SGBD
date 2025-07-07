@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <vector>
 #include <string>
@@ -15,6 +17,8 @@
 #include "diskIterator.hh"
 
 #include "functions.hh"
+
+#include "tree.hh"
 
 int main()
 {
@@ -76,7 +80,17 @@ int main()
     std::cout << "Registros encontrados:\n";
     print_table(query_separated, 50);
 
-    printf("\n");
-    
+    printf("\n--------\n");
     //dataReader.debug();
+    QueryManager qm;
+    qm.dataInfo = dataReader.data_info;
+    //std::string q5 = "SELECT item, id FROM PRODUCTO WHERE item = \"Fruit of the Loom Girl's Socks\"";
+    std::string q5 = "SELECT item, id FROM PRODUCTO WHERE cost = 10.00";
+    //std::string q5 = "SELECT name, id FROM tabla";
+    //std::string q5 = "INSERT INTO PRODUCTO VALUES(12, \"Fruit of the Loom Girl's Socks\", 123.54)";
+    qm.parseQuery(q5);
+    qm.printTokens();
+    printf("\n--------\n");
+    //dataReader.debug();
+
 }

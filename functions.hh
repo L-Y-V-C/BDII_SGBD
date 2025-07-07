@@ -3,8 +3,6 @@
 #include <vector>
 #include <iomanip>
 
-
-
 std::vector<std::string> separate_string(std::string& in_str, char separator)
 {
     std::vector<std::string> result;
