@@ -175,7 +175,6 @@ public:
 			return;
 		}
 
-
 		int sector_size{ disk.get_sector_size() };
 		int maximum_registers = disk.get_remnant_space() / total_register_size;
 		

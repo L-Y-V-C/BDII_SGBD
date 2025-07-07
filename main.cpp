@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <vector>
 #include <string>
@@ -15,6 +17,8 @@
 #include "diskIterator.hh"
 
 #include "functions.hh"
+
+#include "tree.hh"
 
 int main()
 {
@@ -76,7 +80,43 @@ int main()
     std::cout << "Registros encontrados:\n";
     print_table(query_separated, 50);
 
-    printf("\n");
+    printf("\n--------\n");
     //dataReader.debug();
-    
+    QueryManager qm;
+    qm.dataInfo = dataReader.data_info;
+    //std::string q5 = "SELECT item, id FROM PRODUCTO WHERE item = \"Fruit of the Loom Girl's Socks\"";
+    std::string q5 = "SELECT item, id FROM PRODUCTO WHERE cost = 10.00";
+    //std::string q5 = "SELECT name, id FROM tabla";
+    //std::string q5 = "INSERT INTO PRODUCTO VALUES(12, \"Fruit of the Loom Girl's Socks\", 123.54)";
+    qm.parseQuery(q5);
+    qm.printTokens();
+    printf("\n--------\n");
+
+    /*
+    AVLTree tree(0);
+
+    Value v1; v1.datInt = 10;
+    Value v2; v2.datInt = 5;
+    Value v3; v3.datInt = 15;
+    Value v4; v4.datInt = 3;
+    Value v5; v5.datInt = 7;
+    Value v6; v6.datInt = 12;
+    Value v7; v7.datInt = 18;
+
+    tree.insert(v1);
+    tree.insert(v2);
+    tree.insert(v3);
+    tree.insert(v4);
+    tree.insert(v5);
+    tree.insert(v6);
+    tree.insert(v7);
+    tree.insert(v3);
+    tree.insert(v3);
+    tree.insert(v3);
+    tree.insert(v3);
+    tree.insert(v3);
+    tree.insert(v3);
+
+    tree.printTree(tree.root);
+    */
 }

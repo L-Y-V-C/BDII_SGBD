@@ -1,6 +1,3 @@
-#ifndef QUERYMANAGER_HH
-#define QUERYMANAGER_HH
-
 #pragma once
 
 #include <iostream>
@@ -9,11 +6,17 @@
 #include <sstream>
 #include <algorithm>
 
+#include "tree.hh"
+
 class QueryManager
 {
 public:
     std::vector<std::string> tokens;
-    std::string tableName;
+    std::string tableName = "";
+    std::string typeToTree = "";
+    std::string fieldToTree = "";
+    std::vector<std::vector<std::string>> dataInfo;
+    int treeType = 0;
 
     void parseQuery(std::string query) {
         tokens.clear();
@@ -29,26 +32,21 @@ public:
             std::cerr << "tipo de consulta no soportado\n";
         }
     }
-
     void printTokens() {
         std::cout << tableName << "\n";
         for (std::string t : tokens) {
             std::cout << t << "\n";
         }
     }
-
-private:
     std::string trim(std::string& str) {
         std::size_t first = str.find_first_not_of(" \t\n\r");
         std::size_t last = str.find_last_not_of(" \t\n\r");
         return (first == std::string::npos) ? "" : str.substr(first, last - first + 1);
     }
-
     bool startsWith(std::string& str, std::string prefix) {
         return str.size() >= prefix.size() &&
             std::equal(prefix.begin(), prefix.end(), str.begin());
     }
-
     void parseSelect(std::string query) {
         tokens.push_back("SELECT");
 
@@ -67,32 +65,51 @@ private:
         // extract table name
         std::string rest = query.substr(fromPos + 4); // skip "FROM"
         std::istringstream iss2(rest);
-        std::string tableName;
         iss2 >> tableName;
-        tokens.push_back(tableName);
 
         std::size_t wherePos = query.find("WHERE");
         if (wherePos != std::string::npos) {
             tokens.push_back("WHERE");
             std::string cond = query.substr(wherePos + 5); // skip "WHERE"
             cond = trim(cond);
+
+            // Extraer campo, comparador y valor de forma robusta
             std::istringstream iss3(cond);
-            std::string part;
-            int count = 0;
-            while (iss3 >> part && count < 3) {
-                // quitar comillas si es texto
-                if (!part.empty() && part.front() == '"' && part.back() == '"') {
-                    part = part.substr(1, part.size() - 2);
-                }
-                tokens.push_back(part);
-                count++;
+            std::string campo, comparador, valor;
+
+            iss3 >> campo;
+            iss3 >> comparador;
+
+            char c;
+            iss3 >> std::ws; // skip whitespace
+            if (iss3.peek() == '"') {
+                iss3.get(); // remove starting quote
+                std::getline(iss3, valor, '"'); // read until closing quote
+            }
+            else {
+                iss3 >> valor;
+            }
+
+            tokens.push_back(campo);
+            tokens.push_back(comparador);
+            tokens.push_back(valor);
+        }
+        for (auto i : tokens) {
+            if (i == "WHERE") {
+                checkType();
             }
         }
+        if (typeToTree != "") {
+            if (typeToTree == "INTEGER" || typeToTree == "BOOL" || typeToTree == "BOOLEAN")
+                treeType = 0;
+            else if (typeToTree == "DECIMAL")
+                treeType = 1;
+            else
+                treeType = 2;
+        }
+        AVLTree tree(treeType);
     }
-
-
-
-    void parseInsert(const std::string query) {
+    void parseInsert(std::string query) {
         tokens.push_back("INSERT");
 
         std::size_t intoPos = query.find("INTO");
@@ -123,8 +140,28 @@ private:
             tokens.push_back(value);
         }
     }
-
+    void createTree() {
+        for (auto i : tokens) {
+            if (i == "WHERE")
+                printf("\nfind WHERE\n");
+        }
+    }
+    void checkType() {
+        for (int i = 0; i < tokens.size(); i++) {
+            if (tokens[i] == "WHERE") {
+                fieldToTree = tokens[i + 1];
+                break;
+            }
+        }
+        for (auto i : dataInfo) {
+            if (fieldToTree == i[0]) {
+                typeToTree = i[1];
+                break;
+            }
+        }
+    }
 };
+
 /*
 QueryManager qm;
 std::string q1 = "SELECT * FROM tabla";
@@ -147,5 +184,3 @@ std::string q5 = "SELECT name, id FROM tabla WHERE name = \"Juan\"";
 qm.parseQuery(q5);
 qm.printTokens();
 */
-
-#endif
