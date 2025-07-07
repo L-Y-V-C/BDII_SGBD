@@ -30,12 +30,12 @@ int main()
                 table_data_path("table_data.csv"),
                 disk_path("disk.txt"),
                 meta_data_path("meta_data.txt");
-    
+   
+
     std::string data_str = dataReader.read_data(data_path, table_data_path);
-
-    //
-
-     std::cout << data_str << "\n\n";
+    
+    std::cout << "Tabla: " << dataReader.table_name << "\n\n";
+    std::cout << data_str << "\n\n";
 
     dataReader.write_data(diskManager, data_str, meta_data_path);
     dataReader.write_data_on_txt(
@@ -66,7 +66,7 @@ int main()
     std::cout << "\n";
 
    
-    /* TEST PRUEBA EXTRACION DE REGISTROS DE METADATA */
+    // TEST PRUEBA EXTRACION DE REGISTROS DE METADATA
     DiskIterator disk_iterator(disk, dataReader.get_register_size());  // , dataReader.get_field_size());
 
     std::vector<std::string> answer_query;
@@ -91,32 +91,6 @@ int main()
     qm.parseQuery(q5);
     qm.printTokens();
     printf("\n--------\n");
+    //dataReader.debug();
 
-    /*
-    AVLTree tree(0);
-
-    Value v1; v1.datInt = 10;
-    Value v2; v2.datInt = 5;
-    Value v3; v3.datInt = 15;
-    Value v4; v4.datInt = 3;
-    Value v5; v5.datInt = 7;
-    Value v6; v6.datInt = 12;
-    Value v7; v7.datInt = 18;
-
-    tree.insert(v1);
-    tree.insert(v2);
-    tree.insert(v3);
-    tree.insert(v4);
-    tree.insert(v5);
-    tree.insert(v6);
-    tree.insert(v7);
-    tree.insert(v3);
-    tree.insert(v3);
-    tree.insert(v3);
-    tree.insert(v3);
-    tree.insert(v3);
-    tree.insert(v3);
-
-    tree.printTree(tree.root);
-    */
 }
