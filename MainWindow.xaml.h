@@ -133,6 +133,8 @@ namespace winrt::DiscoSimulador::implementation
         // Nombres de archivos configurables
         std::string nombreArchivoEstructura;
         std::string nombreArchivoCSV;
+        //std::string disk_path = "C:\\Users\\tanuki\\source\\repos\\BDII_SGBD\\disk.txt";
+        //std::string disk_path = "C:\\Users\\tanuki\\Desktop\\disk.txt";
         std::string disk_path = "disk.txt";
         std::string meta_data_path = "meta_data.txt";
 

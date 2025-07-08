@@ -23,6 +23,8 @@ public:
     std::vector<std::vector<std::string>> fieldsInfo;
     std::vector<int> idsQueryResult;
     int treeType = 0;
+    std::vector<std::string> finalFields;
+    std::vector<std::vector<std::string>> finalRegs;
 
     void parseQuery(std::string query) {
         std::string trimmed = trim(query);
@@ -131,6 +133,26 @@ public:
         }
         tree.insertFromVector(dataToTree);
         idsQueryResult = tree.returnIds(tokens2.back());
+        tree.printTree(tree.root);
+        printf("\nQUERY RESULT\n");
+        for (auto i : idsQueryResult)
+            std::cout << i << " ";
+        printf("\nEND\n");
+    }
+    void myTrim(std::string& s) {
+        const std::string whitespace = " \t\n\r\f\v";
+        s.erase(s.find_last_not_of(whitespace) + 1);
+        s.erase(0, s.find_first_not_of(whitespace));
+        while (!s.empty() && s.back() == '\0') {
+            s.pop_back();
+        }
+    }
+    void cleanFieldsInfo() {
+        for (int i = 0; i < fieldsInfo.size(); i++) {
+            for (int j = 0; j < fieldsInfo[i].size(); j++) {
+                myTrim(fieldsInfo[i][j]);
+            }
+        }
     }
     void parseInsert(std::string query) {
         typeQuery = "INSERT";
@@ -177,27 +199,28 @@ public:
             }
         }
     }
+    void specifyFields(std::vector<std::vector<std::string>> inRegs) {
+        std::vector<int> activeIndexes;
+        for (int i = 0; i < dataInfo.size(); i++) {
+            for (int j = 0; j < tokens1.size(); j++) {
+                if (dataInfo[i][0] == tokens1[j]) {
+                    finalFields.push_back(tokens1[j]);
+                    activeIndexes.push_back(i);
+                    break;
+                }
+            }
+        }
+        for (int i = 0; i < inRegs.size(); i++) {
+            std::vector<std::string> Reg;
+            for (int j = 0; j < inRegs[i].size(); j++) {
+                for (int k = 0; k < activeIndexes.size(); k++) {
+                    if (activeIndexes[k] == j) {
+                        Reg.push_back(inRegs[i][j]);
+                        break;
+                    }
+                }
+            }
+            finalRegs.push_back(Reg);
+        }
+    }
 };
-
-/*
-QueryManager qm;
-std::string q1 = "SELECT * FROM tabla";
-qm.parseQuery(q1);
-qm.printTokens();
-std::cout << "------\n";
-std::string q2 = "SELECT name, id FROM tabla";
-qm.parseQuery(q2);
-qm.printTokens();
-std::cout << "------\n";
-std::string q3 = "INSERT INTO tabla VALUES(\"id\", \"name\", \"ape\")";
-qm.parseQuery(q3);
-qm.printTokens();
-std::cout << "------\n";
-std::string q4 = "SELECT * FROM tabla WHERE age >= 18";
-qm.parseQuery(q4);
-qm.printTokens();
-std::cout << "------\n";
-std::string q5 = "SELECT name, id FROM tabla WHERE name = \"Juan\"";
-qm.parseQuery(q5);
-qm.printTokens();
-*/

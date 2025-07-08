@@ -113,8 +113,6 @@ public:
 
 			std::vector<std::string> row = get_table_info(line);
 
-
-
 			std::string merged_row = merge_data_row(row, data_info, data_size);
 			
 			data_line += merged_row + '/';
