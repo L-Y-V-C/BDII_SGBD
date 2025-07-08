@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="DiscoSimulador.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Simulador de Disco Duro">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Panel de Configuración -->
+        <Border Grid.Row="0" Background="#E7E3E0" Padding="20" Margin="10">
+            <StackPanel>
+                <TextBlock Text="Configuración del Disco Duro" 
+                      FontSize="18" FontWeight="Bold" 
+                      Foreground="#A6856A"
+                      Margin="0,0,0,15"/>
+
+                <!-- Configuración de parámetros del disco -->
+                <Grid Margin="0,0,0,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="0,0,15,0">
+                        <TextBlock Text="Número de Platos:" 
+                              FontWeight="SemiBold" 
+                              Foreground="#9B8784"/>
+                        <ComboBox x:Name="PlatosComboBox" 
+                             SelectedIndex="0" 
+                             Width="120"
+                             HorizontalAlignment="Left"
+                             Margin="0,5,0,0"
+                             Background="#9FA292"
+                             Foreground="White">
+                            <ComboBoxItem Content="1"/>
+                            <ComboBoxItem Content="2"/>
+                            <ComboBoxItem Content="3"/>
+                            <ComboBoxItem Content="4"/>
+                            <ComboBoxItem Content="5"/>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Margin="0,0,15,0">
+                        <TextBlock Text="Pistas por Superficie:" 
+                              FontWeight="SemiBold" 
+                              Foreground="#9B8784"/>
+                        <ComboBox x:Name="PistasComboBox" 
+                             SelectedIndex="2"
+                             Width="120"
+                             HorizontalAlignment="Left"
+                             Margin="0,5,0,0"
+                             Background="#9FA292"
+                             Foreground="White">
+                            <ComboBoxItem Content="100"/>
+                            <ComboBoxItem Content="500"/>
+                            <ComboBoxItem Content="1000"/>
+                            <ComboBoxItem Content="2000"/>
+                            <ComboBoxItem Content="5000"/>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2" Margin="0,0,15,0">
+                        <TextBlock Text="Sectores por Pista:" 
+                              FontWeight="SemiBold" 
+                              Foreground="#9B8784"/>
+                        <ComboBox x:Name="SectoresComboBox" 
+                             SelectedIndex="0"
+                             Width="120"
+                             HorizontalAlignment="Left"
+                             Margin="0,5,0,0"
+                             Background="#9FA292"
+                             Foreground="White">
+                            <ComboBoxItem Content="64"/>
+                            <ComboBoxItem Content="128"/>
+                            <ComboBoxItem Content="256"/>
+                            <ComboBoxItem Content="512"/>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="3" Margin="0,0,15,0">
+                        <TextBlock Text="Tamaño de Sector:" 
+                              FontWeight="SemiBold" 
+                              Foreground="#9B8784"/>
+                        <ComboBox x:Name="TamanoSectorComboBox" 
+                             SelectedIndex="0"
+                             Width="120"
+                             HorizontalAlignment="Left"
+                             Margin="0,5,0,0"
+                             Background="#9FA292"
+                             Foreground="White">
+                            <ComboBoxItem Content="512"/>
+                            <ComboBoxItem Content="1024"/>
+                            <ComboBoxItem Content="2048"/>
+                            <ComboBoxItem Content="4096"/>
+                        </ComboBox>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Configuración de archivos -->
+                <Grid Margin="0,0,0,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="0,0,15,0">
+                        <TextBlock Text="Archivo de Estructura:" 
+                              FontWeight="SemiBold" 
+                              Foreground="#9B8784"/>
+                        <TextBox x:Name="ArchivoEstructuraTextBox"
+                            Text="struct_table.txt"
+                            FontSize="14"
+                            Padding="10"
+                            Margin="0,5,0,0"
+                            Background="#9FA292"
+                            Foreground="White"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1">
+                        <TextBlock Text="Archivo CSV:" 
+                              FontWeight="SemiBold" 
+                              Foreground="#9B8784"/>
+                        <TextBox x:Name="ArchivoCSVTextBox"
+                            Text="taxables.csv"
+                            FontSize="14"
+                            Padding="10"
+                            Margin="0,5,0,0"
+                            Background="#9FA292"
+                            Foreground="White"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Botón de inicializar -->
+                <Button x:Name="InicializarButton"
+                   Content="Inicializar Disco"
+                   Background="#A6856A"
+                   Foreground="White"
+                   Padding="15,8"
+                   HorizontalAlignment="Center"
+                   Margin="0,0,0,20"
+                   Click="InicializarButton_Click"/>
+
+                <!-- Panel de Consulta -->
+                <StackPanel x:Name="ConsultaPanel"
+                       Visibility="Collapsed">
+                    <TextBlock Text="Realizar Consulta" 
+                          FontSize="16" FontWeight="Bold" 
+                          Foreground="#A6856A"
+                          Margin="0,0,0,10"/>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox x:Name="ConsultaTextBox"
+                            Grid.Column="0"
+                            PlaceholderText="Ingrese su consulta aquí..."
+                            FontSize="14"
+                            Padding="10"
+                            Margin="0,0,10,0"
+                            Background="#9FA292"
+                            Foreground="White"
+                            KeyDown="ConsultaTextBox_KeyDown"/>
+
+                        <Button Grid.Column="1"
+                           x:Name="EjecutarButton"
+                           Content="Ejecutar"
+                           Background="#A6856A"
+                           Foreground="White"
+                           Padding="15,8"
+                           Click="EjecutarButton_Click"/>
+                    </Grid>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Panel de Resultados -->
+        <ScrollViewer Grid.Row="1" Margin="10">
+            <StackPanel x:Name="ResultadosPanel">
+                <!-- 1. Datos del CSV -->
+                <Border x:Name="DatosPanel" 
+                   Background="#E7E3E0" 
+                   Padding="15" 
+                   Margin="0,0,0,10"
+                   BorderBrush="#A6856A"
+                   BorderThickness="2"
+                   Visibility="Collapsed">
+                    <StackPanel>
+                        <TextBlock Text="Datos del Archivo CSV" 
+                              FontSize="16" FontWeight="Bold" 
+                              Foreground="#A6856A"
+                              Margin="0,0,0,10"/>
+                        <ScrollViewer x:Name="DatosScrollViewer" 
+                                 MaxHeight="200" 
+                                 VerticalScrollBarVisibility="Auto">
+                            <StackPanel x:Name="DatosContainer"/>
+                        </ScrollViewer>
+                    </StackPanel>
+                </Border>
+
+                <!-- 2. Consulta Ejecutada -->
+                <Border x:Name="ConsultaEjecutadaPanel" 
+                   Background="#E7E3E0" 
+                   Padding="15" 
+                   Margin="0,0,0,10"
+                   BorderBrush="#A6856A"
+                   BorderThickness="2"
+                   Visibility="Collapsed">
+                    <StackPanel>
+                        <TextBlock Text="Consulta Ejecutada" 
+                              FontSize="16" FontWeight="Bold" 
+                              Foreground="#A6856A"
+                              Margin="0,0,0,10"/>
+                        <TextBlock x:Name="ConsultaEjecutadaTextBlock" 
+                              FontSize="14" 
+                              Foreground="#9B8784"
+                              FontFamily="Consolas"
+                              TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- 3. Tabla de Resultados -->
+                <Border x:Name="TablaPanel" 
+                   Background="#E7E3E0" 
+                   BorderBrush="#A6856A" 
+                   BorderThickness="2"
+                   Margin="0,0,0,10"
+                   Visibility="Collapsed">
+                    <StackPanel>
+                        <Border Background="#A6856A" Padding="15">
+                            <TextBlock Text="Resultados de la Consulta" 
+                                  FontSize="16" FontWeight="Bold"
+                                  Foreground="White"/>
+                        </Border>
+
+                        <!-- Contenedor de resultados dinámico -->
+                        <StackPanel x:Name="ResultadosContainer" 
+                               Background="#E7E3E0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Mensaje de instrucciones -->
+                <Border x:Name="InstruccionesPanel" 
+                   Background="#E7E3E0" 
+                   BorderBrush="#A6856A" 
+                   BorderThickness="2"
+                   Padding="20"
+                   Margin="0,10,0,0">
+                    <TextBlock Text="Configura los parámetros del disco duro, especifica los nombres de archivos y presiona 'Inicializar Disco' para comenzar."
+                          FontSize="14"
+                          Foreground="#9B8784"
+                          TextWrapping="Wrap"/>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Window>
