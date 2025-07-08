@@ -223,6 +223,7 @@ public:
 					file << pos << " ";
 
 
+				iterator.set_data(data[counter]);
 				counter++;
 				iterator.next();
 			}
@@ -232,7 +233,7 @@ public:
 		}
 	}
 	
-	void insert_query(DiskManager& iterator, std::vector<std::string>& data, std::string meta_data_path)
+	void insert_query(DiskManager& iterator, std::vector<std::string>& data, std::string meta_data_path, std::string data_path)
 	{
 		std::ofstream file(meta_data_path, std::ios::app);
 
@@ -258,6 +259,8 @@ public:
 			return;
 		}
 
+		std::string csv_line;
+		csv_line += "\n";
 
 		file << data[0] << " ";
 
@@ -272,10 +275,20 @@ public:
 			//ENCODE
 			std::string encoded = encode_value(type, number, limit, value);
 
-			if (i == (data_size.size() - 1)) //ultimo
-				encoded += '/';
+
+			
+			if (data_info[i][1] == "VARCHAR")
+				csv_line += "\"" + encoded + "\"";
 			else
+				csv_line += encoded;
+
+			
+
+			if (i != (data_size.size() - 1)) //ultimo
+			{
+				csv_line += ", ";
 				encoded += ',';
+			}
 
 
 			std::vector<size_t> initial_pos = iterator.get_position();
@@ -301,7 +314,15 @@ public:
 			iterator.next();
 		}
 		std::cout << "\n";
+		iterator.set_data('/');
 		file << "\n";
+
+		std::cout << "CSV LINE: " << csv_line << "\n";
+
+		
+		std::ofstream file_2(data_path, std::ios::app);
+		file_2 << csv_line << "\n";
+		register_count++;
 		
 	}
 

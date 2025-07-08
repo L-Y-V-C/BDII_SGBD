@@ -50,7 +50,7 @@ int main()
                                  disk_path,
                                  data_str,
                                  disk);
-    //disk.print_disk();
+    
 
     
 
@@ -100,7 +100,7 @@ int main()
     qm.parseQuery(q5);
     qm.printTokens();   
 
-    dataReader.insert_query(diskManager, qm.tokens1, meta_data_path);
+    dataReader.insert_query(diskManager, qm.tokens1, meta_data_path, data_path);
 
     meta_data_info = dataReader.read_all_meta_data(meta_data_path);
     //meta_data_info = dataReader.read_meta_data(meta_data_path, id_to_find);
@@ -141,4 +141,6 @@ int main()
     qm.specifyFields(answer_query2);
 
     //dataReader.debug();
+
+    disk.print_disk();
 }
