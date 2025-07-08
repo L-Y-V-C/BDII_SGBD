@@ -120,12 +120,12 @@ int main()
                 // Aqu� enlaza Disk, DataReader y l�gica
 
                 reset_all(disk, diskManager, dataReader);
-                disk.assign_size(6, 8, 10, 6);
-                //disk.assign_size(numberInputs[0], numberInputs[1], numberInputs[2], numberInputs[3]);
-                //data_path = charArrayToString(fileNames[0]);
-                //table_data_path = charArrayToString(fileNames[1]);
-                data_path = "C:\\Users\\diego\\source\\repos\\GLFWVisualStudioSetup-master\\source\\taxables.csv";
-                table_data_path = "C:\\Users\\diego\\source\\repos\\GLFWVisualStudioSetup-master\\source\\struct_table.txt";
+                //disk.assign_size(6, 8, 10, 6);
+                disk.assign_size(numberInputs[0], numberInputs[1], numberInputs[2], numberInputs[3]);
+                data_path = charArrayToString(fileNames[0]);
+                table_data_path = charArrayToString(fileNames[1]);
+                //data_path = "C:\\Users\\diego\\source\\repos\\GLFWVisualStudioSetup-master\\source\\taxables.csv";
+                //table_data_path = "C:\\Users\\diego\\source\\repos\\GLFWVisualStudioSetup-master\\source\\struct_table.txt";
 
                 std::string data_str = dataReader.read_data(data_path, table_data_path);
                 dataReader.write_data(diskManager, data_str, meta_data_path);
