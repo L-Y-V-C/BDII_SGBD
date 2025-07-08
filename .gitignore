@@ -12,8 +12,6 @@
 !*.xaml.h
 !*.idl
 !*.config
-!app.manifest
-!Package.appxmanifest
 
 # Excluir archivos comunes de Visual Studio que podrían estar en la raíz
 *.sln
