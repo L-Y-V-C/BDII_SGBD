@@ -92,5 +92,4 @@ int main()
     qm.printTokens();
     printf("\n--------\n");
     //dataReader.debug();
-
 }
