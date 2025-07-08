@@ -1,14 +1,17 @@
 #pragma once
 
-template<class T>
-struct Nodo {
-    std::string clave; 
-    std::vector<T> registros;
-    Nodo* nodos[2];
+#include <vector>
+
+#include "valueData.hh"
+
+class Node {
+public:
+    Value val;
+    Node* left;
+    Node* right;
     int height;
-    int id;
-    Nodo(const std::string& clave_, const T& val) : clave(clave_), height(1) {
-        registros.push_back(val);
-        nodos[0] = nodos[1] = nullptr;
-    }
+    std::vector<int> ids;
+
+    Node(Value inValue) :
+        val(inValue), left(0), right(0), height(1) {}
 };

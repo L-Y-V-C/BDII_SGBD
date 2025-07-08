@@ -11,56 +11,91 @@
 #include "diskManager.hh"
 
 
+
 class DataReader
 {
 public:
+	using vector_data = std::vector< std::vector<std::string>>;
 
-	using vector_data = std::vector< std::vector<std::string> >;
+	vector_data data_info;
+	std::vector<int> data_size;
+	size_t total_register_size, register_count;
+	std::string table_name;
 
 	DataReader():
-		data_info(), data_size(), total_register_size(0), register_count(0) { }
+		data_info(), data_size(), table_name(), total_register_size(0), register_count(0) { }
 
 	void get_format(std::string table_data_path)
 	{
 		std::ifstream file(table_data_path);
 		std::string line;
 
+
 		while (std::getline(file, line))
 		{
-			std::vector<std::string> row = get_row(line, ' ');
+			std::vector<std::string> row = get_line_info(line);
+			std::string data_type;
 
-			if (row.size() > 3)
+			if (row[0] == "CREATE" && row[1] == "TABLE")
+			{
+				std::string temp_table_name = row[2];
+
+				if (temp_table_name.back() == '(')
+					temp_table_name.pop_back();
+
+				table_name = temp_table_name;
+			}
+
+			if (is_a_type(row, data_type))
 			{
 				std::string name = row[0];
-				std::string type = row[1].substr(0, row[1].find('('));
 
-				// Combinacion
-				std::string length = row[1] + row[2];
-				size_t start = length.find('(');
-				size_t end = length.find(')');
-				length = length.substr(start + 1, end - start - 1);
-
-				data_info.push_back({ name, type, length });
-
-				// Comma pos
-				size_t comma_pos = length.find(',');
-
-				if (comma_pos == std::string::npos) //NO ENCONTRADO
-					data_size.push_back(std::stoi(length));
-				else // Decimal
+				if (data_type == "BOOLEAN" || data_type == "DATE")
 				{
-					data_size.push_back(std::stoi(length.substr(0, comma_pos)));
-					data_size.back()++;
-				}
-					
+					std::string length;
 
+					if (data_type == "BOOLEAN")
+						length = '1';
+					else
+						length = "10";
+
+					data_info.push_back({ name, data_type, length});
+					data_size.push_back(std::stoi(length));
+				}
+				else
+				{
+					// Combinacion
+					std::string length = row[1];
+
+					if (data_type == "BOOLEAN")
+						length = "1";
+					else if (data_type == "DATE")
+						length = "10";
+					else
+					{
+						size_t start = length.find('(');
+						size_t end = length.find(')');
+						length = length.substr(start + 1, end - start - 1);
+					}
+					
+					data_info.push_back({ name, data_type, length });
+
+					// Comma pos
+					size_t comma_pos = length.find(',');
+					if (comma_pos == std::string::npos) // NO ES DECIMAL
+						data_size.push_back(std::stoi(length));
+					else								// ES DECIMAL
+					{
+						data_size.push_back(std::stoi(length.substr(0, comma_pos)));
+						data_size.back()++;
+					}
+				}
 			}
 		}
 
-		
-		for (int i = 0; i < data_info.size(); i++)
-			total_register_size += data_size[i] + 1;
 
+		for (int i = 0; i < data_size.size(); i++)
+			total_register_size += data_size[i] + 1;
 
 		file.close();
 	}
@@ -71,94 +106,23 @@ public:
 		std::string line, data_line;
 
 		get_format(table_data_path); // Update data_info
-
+		
 		int line_counter{ 0 };
-
 		while (std::getline(file, line))
 		{
 			if (line_counter++ == 0)
-				continue;
+				continue;			
 
-			// Get item name without quotation marks
-			std::string item;
-			size_t first_quote = line.find_first_of('"');
-			size_t second_quote = line.find_last_of('"');
-			item = line.substr(first_quote + 1, second_quote - first_quote - 1);
+			std::vector<std::string> row = get_table_info(line);
 
-			// Fill empty item name with "WORD"
-			line = line.substr(0, line.find_first_of(',')) + ",WORD" + line.substr(line.find_last_of('"') + 1, line.size() - (line.find_last_of('"') + 1));
+
+
+			std::string merged_row = merge_data_row(row, data_info, data_size);
 			
-			// Erase spaces
-			line.erase(std::remove(line.begin(), line.end(), ' '), line.end());
-			
+			data_line += merged_row + '/';
 
-			std::vector<std::string> row = get_row(line, ',');
-
-
-			for (int i = 0; i < row.size(); i++)
-			{
-
-				std::string& name{ data_info[i][0] },
-					& type{ data_info[i][1] },
-					& number{ data_info[i][2] },
-					& value{ row[i] };
-
-				std::string temp;
-
-				if (type == "INTEGER")
-				{
-					int limit{ std::stoi(number) };
-					temp.resize(limit, '0');
-
-					for (int i = 0; i < limit && i < value.size(); i++)
-						temp[limit - 1 - i] = value[value.size() - 1 - i];
-				}
-				else if (type == "DECIMAL")
-				{
-					size_t comma_pos = number.find(',');
-
-					int num_size{ std::stoi(number.substr(0, comma_pos)) };
-
-					int float_size{ std::stoi(number.substr(comma_pos + 1)) },
-						int_size{ num_size - float_size };
-
-
-					int dot_pos = int_size;
-					temp.resize(num_size + 1, '0');
-					temp[dot_pos] = '.';
-
-
-					// String values of int part and float part
-					size_t dot_index = value.find('.');
-					std::string int_part{ value.substr(0, dot_index) },
-						float_part{ value.substr(dot_index + 1, value.size() - dot_index) };
-
-					// Int
-					for (int i = 0; i < int_size && i < int_part.size(); i++)
-						temp[dot_pos - 1 - i] = int_part[int_part.size() - 1 - i];
-
-					// Float
-					for (int i = 0; i < float_size && i < float_part.size(); i++)
-						temp[dot_pos + 1 + i] = float_part[i];
-
-				}
-				else if (type == "VARCHAR") // item copy
-				{
-					int limit{ std::stoi(number) };
-					temp.resize(limit, '\0');
-
-					for (int i = 0; i < limit && i < item.size(); i++)
-						temp[i] = item[i];
-				}
-
-				data_line += temp;
-				if (i != (row.size() - 1))
-					data_line += ',';
-					
-			}
 			line_counter++;
 			register_count++;
-			data_line += '/';
 		}
 
 		file.close();
@@ -174,7 +138,6 @@ public:
 			std::cerr << "Error al abrir el archivo " << disk_path << '\n';
 			return;
 		}
-
 
 		int sector_size{ disk.get_sector_size() };
 		int maximum_registers = disk.get_remnant_space() / total_register_size;
@@ -212,7 +175,8 @@ public:
 		int sector_size{ disk.get_sector_size() };
 		int maximum_registers = disk.get_remnant_space() / total_register_size;
 
-
+		//debug();
+    
 		int counter{ 0 };
 		for (int i = 0; i < register_count; i++)
 		{
@@ -225,34 +189,43 @@ public:
 			int lower = i * total_register_size,
 				upper = (i+1) * total_register_size;
 
-			std::string sub_str = data.substr(lower, upper);
+			std::string sub_str = data.substr(lower, upper - lower);
 
 			int register_id = std::stoi(sub_str.substr(0, sub_str.find(',')));
 
+			std::vector<size_t> initial_pos, final_pos;
 
-			// Save positions, before and after inserting a register
-			std::vector<size_t> initial_pos = iterator.get_position();
+			//std::cout << i << " : ";
 
-			for (int j = lower; j < upper; j++, iterator.next(), counter++)
-				iterator.set_data(data[j]);
-
-			std::vector<size_t> final_pos = iterator.get_position();
-
-
-			// Save meta data
 			file << register_id << " ";
-			for (auto i : initial_pos)
-				file << i << " ";
-			
-			for (int i = 0; i < final_pos.size(); i++)
+			for (int j = 0; j < data_size.size(); j++)
 			{
-				file << final_pos[i];
-				if (i == final_pos.size() - 1)
-					file << "\n";
-				else
-					file << " ";
-			}
+				initial_pos = iterator.get_position();
 
+				for (int k = 0; k < data_size[j]; ++k)
+				{
+					iterator.set_data(data[counter]);
+					std::cout << iterator.current_char();
+					iterator.next();
+					counter++;
+				}
+
+				final_pos = iterator.get_position();
+
+				
+				for (auto pos : initial_pos)
+					file << pos << " ";
+
+				for (auto pos : final_pos)
+					file << pos << " ";
+
+
+				counter++;
+				iterator.next();
+			}
+			std::cout << "\n";
+
+			file << "\n";
 		}
 	}
 	
@@ -262,7 +235,8 @@ public:
 		std::ifstream file(meta_data_path);
 		std::string line;
 		std::vector<std::vector<std::string>> results;
-		while (std::getline(file, line)) {
+		while (std::getline(file, line))
+		{
 			std::istringstream iss(line);
 			std::string id_str;
 			if (!(iss >> id_str))
@@ -275,9 +249,9 @@ public:
 				result.push_back(id_str); // first
 
 				std::string token;
-				while (iss >> token) {
+				while (iss >> token)
 					result.push_back(token);
-				}
+
 				results.push_back(result);
 			}
 		}
@@ -298,16 +272,124 @@ public:
 	size_t get_register_size() { return total_register_size; }
 
 private:
-	std::vector<std::string> get_row(std::string& line, char delimiter = ',')
+	std::vector<std::string> get_table_info(std::string& line)
+	{
+		std::vector<std::string> data;
+		std::string palabra;
+		bool parentesis_abierto{ false };
+		bool comillas_abierta{ false };
+
+		char comilla_symbol{ '\0' };
+		for (char c : line)
+		{
+
+			if (c == '(' && !parentesis_abierto)
+			{
+				parentesis_abierto = true;
+				continue;
+			}
+
+			if (c == ')' && parentesis_abierto)
+			{
+				parentesis_abierto = false;
+				continue;
+			}
+
+			if (!parentesis_abierto)
+				continue;
+
+
+			if (((c == '"') || (c == '\'')) && !comillas_abierta)
+			{
+				if (c == '"')
+					comilla_symbol = '"';
+				else
+					comilla_symbol = '\'';
+
+				comillas_abierta = true;
+				continue;
+			}
+
+			if (c == comilla_symbol && comillas_abierta)
+			{
+				comillas_abierta = false;
+				continue;
+			}
+
+
+			if (c == ',' && !comillas_abierta) // Push palabra
+			{
+				data.push_back(palabra);
+				palabra.clear();
+				continue;
+			}
+
+			if (comillas_abierta)
+				palabra += c;
+			else if (c != ' ' && c!= ',' && !comillas_abierta) //NO ESTA ENTRE COMILLAS
+				palabra += c;
+		}
+		if (!palabra.empty())
+			data.push_back(palabra);
+
+
+		
+		return data;
+	}
+
+	std::vector<std::string> get_line_info(std::string& line)
 	{
 		std::vector<std::string> row;
-		std::stringstream ss(line);
+		std::string palabra;
+		bool dentro_parentesis{ false };
 
-		std::string field;
-		while (std::getline(ss, field, delimiter))
-			row.push_back(field);
+		for (char c : line) {
+			if (std::isalnum(c) || c == '_')
+				palabra += c;
+
+			else if (c == '(')
+			{
+				dentro_parentesis = true;
+				palabra += c;
+			}
+			else if (c == ')')
+			{
+				palabra += c;
+				dentro_parentesis = false;
+			}
+			else if (c == ',' && dentro_parentesis) {
+				palabra += c;  
+			}
+			else if (!dentro_parentesis)
+			{
+				if (!palabra.empty())
+				{
+					row.push_back(palabra);
+					palabra.clear();
+				}
+			}
+		}
+
+		if (!palabra.empty())
+			row.push_back(palabra);
 
 		return row;
+	}
+
+	bool is_a_type(std::vector<std::string>& vector, std::string& data_type)
+	{
+		std::vector<std::string> TYPES({ "VARCHAR", "INTEGER", "DECIMAL", "BOOLEAN", "DATE" });
+
+		for (auto string : vector)
+			for (auto type : TYPES)
+				if (string.find(type) != std::string::npos) //ENCONTRADO
+				{
+					data_type = type;
+					return true;
+				}
+
+
+		return false;
 	}
 
 	void show_data_info()
@@ -328,10 +410,93 @@ private:
 		std::cout << "\n";
 
 	}
-public:
-	vector_data data_info;
-	std::vector<int> data_size;
-	size_t total_register_size, register_count;
+
+	std::string encode_value(std::string& type, std::string& number, int& limit, std::string& value)
+	{
+		std::string temp;
+
+		if (type == "INTEGER")
+		{
+			temp.resize(limit, '0');
+
+			for (int i = 0; i < limit && i < value.size(); i++)
+				temp[limit - 1 - i] = value[value.size() - 1 - i];
+		}
+		else if (type == "DECIMAL")
+		{
+			size_t comma_pos = number.find(',');
+
+			int num_size{ std::stoi(number.substr(0, comma_pos)) };
+
+			int float_size{ std::stoi(number.substr(comma_pos + 1)) },
+				int_size{ num_size - float_size };
+
+
+			int dot_pos = int_size;
+			temp.resize(limit, '0');
+			temp[dot_pos] = '.';
+
+
+			// String values of int part and float part
+			size_t dot_index = value.find('.');
+			std::string int_part{ value.substr(0, dot_index) },
+				float_part{ value.substr(dot_index + 1, value.size() - dot_index) };
+
+			// Int
+			for (int i = 0; i < int_size && i < int_part.size(); i++)
+				temp[dot_pos - 1 - i] = int_part[int_part.size() - 1 - i];
+
+			// Float
+			for (int i = 0; i < float_size && i < float_part.size(); i++)
+				temp[dot_pos + 1 + i] = float_part[i];
+
+		}
+		else if (type == "VARCHAR") // item copy
+		{
+			temp.resize(limit, '\0');
+
+			for (int j = 0; j < limit && j < value.length(); j++)
+				temp[j] = value[j];
+		}
+		else if (type == "DATE") // item copy
+		{
+			temp.resize(limit);
+
+			for (int j = 0; j < limit && j < value.length(); j++)
+				temp[j] = value[j];
+		}
+		else if (type == "BOOLEAN") // item copy
+		{
+			if (value == "TRUE")
+				temp = "1";
+			else
+				temp = "0";
+		}
+
+		return temp;
+	}
+	
+	std::string merge_data_row(std::vector<std::string>& row, vector_data& data_info, std::vector<int>& data_size)
+	{
+		std::string data_line;
+
+		for (int i = 0; i < row.size(); i++)
+		{
+			std::string& type = data_info[i][1];
+			std::string& number = data_info[i][2];
+			std::string& value = row[i];
+
+			int limit = data_size[i];
+
+			std::string encoded = encode_value(type, number, limit, value);
+			data_line += encoded;
+
+			if (i != row.size() - 1)
+				data_line += ',';
+		}
+
+		return data_line;
+	}
 };
 
 #endif
