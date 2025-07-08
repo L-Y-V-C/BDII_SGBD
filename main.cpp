@@ -45,7 +45,6 @@ void reset_all(Disk& in_disk, DiskManager& in_manager, DataReader& in_reader)
 
 int main()
 {
-    // Inicializar GLFW
     if (!glfwInit()) return -1;
     const char* glsl_version = "#version 130";
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -55,10 +54,9 @@ int main()
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
 
-    // Inicializar GLAD
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) return -1;
 
-    // Inicializar ImGui
+    // start ImGui
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
@@ -66,15 +64,14 @@ int main()
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    // Variables de interfaz
     int numberInputs[4] = { 0 };
     char fileNames[2][128] = {};
     char queryInput[256] = {};
 
     std::string data_path,
         table_data_path,
-        disk_path("C:\\Users\\diego\\source\\repos\\GLFWVisualStudioSetup-master\\source\\disk.txt"),
-        meta_data_path("C:\\Users\\diego\\source\\repos\\GLFWVisualStudioSetup-master\\source\\meta_data.txt");
+        disk_path("C:\\Users\\diego\\source\\repos\\GLFWVisualStudioSetup-master\\source\\disk.txt"), // ruta absoluta
+        meta_data_path("C:\\Users\\diego\\source\\repos\\GLFWVisualStudioSetup-master\\source\\meta_data.txt"); // ruta absoluta
     std::string query;
 
     bool showTable = true;
@@ -82,13 +79,12 @@ int main()
     bool showMetaDataPopup = false;
     int metaDataIndex = -1;
 
-    // Variables
     Disk disk;
     DiskManager diskManager(disk);
     DataReader dataReader;
 
     std::vector<std::vector<std::string>> allData;
-    // Loop principal
+
     while (!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
@@ -117,15 +113,11 @@ int main()
             if (ImGui::Button("Inicializar"))
             {
                 printf("Inicializar presionado\n");
-                // Aqu� enlaza Disk, DataReader y l�gica
 
                 reset_all(disk, diskManager, dataReader);
-                //disk.assign_size(6, 8, 10, 6);
                 disk.assign_size(numberInputs[0], numberInputs[1], numberInputs[2], numberInputs[3]);
                 data_path = charArrayToString(fileNames[0]);
                 table_data_path = charArrayToString(fileNames[1]);
-                //data_path = "C:\\Users\\diego\\source\\repos\\GLFWVisualStudioSetup-master\\source\\taxables.csv";
-                //table_data_path = "C:\\Users\\diego\\source\\repos\\GLFWVisualStudioSetup-master\\source\\struct_table.txt";
 
                 std::string data_str = dataReader.read_data(data_path, table_data_path);
                 dataReader.write_data(diskManager, data_str, meta_data_path);
@@ -158,14 +150,12 @@ int main()
         }
         else
         {
-            // Botón "Inicializar" deshabilitado
             ImGui::BeginDisabled();
             ImGui::Button("Inicializar");
             ImGui::EndDisabled();
 
             ImGui::SameLine();
-
-            // Botón "Stop" habilitado
+            
             if (ImGui::Button("Stop"))
             {
                 inicializado = false;
@@ -181,7 +171,6 @@ int main()
         {
             printf("GO presionado: %s\n", queryInput);
             
-            // Aqui ejecuta consulta y llena finalFields y finalRegs
             query = charArrayToString(queryInput);
             QueryManager qm;
             qm.dataInfo = dataReader.data_info;
@@ -197,10 +186,8 @@ int main()
                 DiskIterator disk_iterator(disk, dataReader.get_register_size());
                 std::vector<std::vector<std::string>> answer_query = disk_iterator.iterateAndExtractRegs(meta_data_info);
 
-
                 //qm.specifyFields(answer_query);
                 //finalFields = qm.finalFields;
-
                 finalRegs = answer_query;
                 select = true;
             }
@@ -222,7 +209,6 @@ int main()
             for (int i = 0; i < dataReader.data_info.size(); i++)
                 finalFields.push_back(dataReader.data_info[i][0]);
 
-            // Solo cargar todos los datos si aún no hay datos cargados
             if (finalRegs.empty() && inicializado)
             {
                 std::vector<std::vector<std::string>>meta_data_info = dataReader.read_all_meta_data(meta_data_path);
@@ -275,7 +261,7 @@ int main()
 
             for (int i = 1; i < meta_data[metaDataIndex].size(); i++, nom_index++)
             {
-                if ((i - 1) % 10 == 0) // Nombre
+                if ((i - 1) % 10 == 0)
                 {
                     ImGui::Separator();
                     ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), dataReader.data_info[(i - 1) / 10][0].c_str());
