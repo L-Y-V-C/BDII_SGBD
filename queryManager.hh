@@ -23,6 +23,8 @@ public:
     std::vector<std::vector<std::string>> fieldsInfo;
     std::vector<int> idsQueryResult;
     int treeType = 0;
+    std::vector<std::string> finalFields;
+    std::vector<std::vector<std::string>> finalRegs;
 
     void parseQuery(std::string query) {
         std::string trimmed = trim(query);
@@ -118,7 +120,6 @@ public:
                 treeType = 2;
         }
         AVLTree tree(treeType);
-
         if (tokens2.empty()) {
             tokens2[1] = dataInfo[0][0];
         }
@@ -198,27 +199,28 @@ public:
             }
         }
     }
+    void specifyFields(std::vector<std::vector<std::string>> inRegs) {
+        std::vector<int> activeIndexes;
+        for (int i = 0; i < dataInfo.size();i++) {
+            for (int j = 0; j < tokens1.size(); j++) {
+                if (dataInfo[i][0] == tokens1[j]) {
+                    finalFields.push_back(tokens1[j]);
+                    activeIndexes.push_back(i);
+                    break;
+                }
+            }
+        }
+        for (int i = 0; i < inRegs.size(); i++) {
+            std::vector<std::string> Reg;
+            for (int j = 0; j < inRegs[i].size(); j++) {
+                for (int k = 0; k < activeIndexes.size(); k++) {
+                    if (activeIndexes[k] == j) {
+                        Reg.push_back(inRegs[i][j]);
+                        break;
+                    }
+                }
+            }
+            finalRegs.push_back(Reg);
+        }
+    }
 };
-
-/*
-QueryManager qm;
-std::string q1 = "SELECT * FROM tabla";
-qm.parseQuery(q1);
-qm.printTokens();
-std::cout << "------\n";
-std::string q2 = "SELECT name, id FROM tabla";
-qm.parseQuery(q2);
-qm.printTokens();
-std::cout << "------\n";
-std::string q3 = "INSERT INTO tabla VALUES(\"id\", \"name\", \"ape\")";
-qm.parseQuery(q3);
-qm.printTokens();
-std::cout << "------\n";
-std::string q4 = "SELECT * FROM tabla WHERE age >= 18";
-qm.parseQuery(q4);
-qm.printTokens();
-std::cout << "------\n";
-std::string q5 = "SELECT name, id FROM tabla WHERE name = \"Juan\"";
-qm.parseQuery(q5);
-qm.printTokens();
-*/
