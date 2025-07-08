@@ -25,6 +25,8 @@ public:
 	DataReader():
 		data_info(), data_size(), table_name(), total_register_size(0), register_count(0) { }
 
+
+
 	void get_format(std::string table_data_path)
 	{
 		std::ifstream file(table_data_path);

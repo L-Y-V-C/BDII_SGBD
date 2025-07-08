@@ -21,7 +21,15 @@ public:
 			tracks[i].print();
 		}
 	}
-	
+
+	void clear()
+	{
+
+		for (int i = 0; i < tracks.size(); i++)
+			tracks[i].clear();
+		tracks.clear();
+	}
+
 };
 
 #endif
