@@ -58,6 +58,8 @@ public:
 		plates.clear();
 	}
 
+	
+
 	int get_sector_size() { return sector_size; }
 private:
 	int plate_number, track_number, sector_number, sector_size;

@@ -26,6 +26,13 @@ public:
 		data_info(), data_size(), table_name(), total_register_size(0), register_count(0) { }
 
 
+	void reset() {
+		data_info.clear();
+		data_size.clear();
+		table_name.clear();
+		total_register_size = 0;
+		register_count = 0;
+	}
 
 	void get_format(std::string table_data_path)
 	{

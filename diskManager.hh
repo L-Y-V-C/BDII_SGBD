@@ -23,6 +23,9 @@ public:
     std::vector<size_t> get_position() { return iterator.get_position(); }
 
     Disk& get_disk() { return disk; }
+    void reset() {
+        iterator.resetIndexes();
+    }
 
 private:
     Disk& disk;

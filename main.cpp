@@ -37,7 +37,12 @@ std::string charArrayToString(const char* charArray) {
     return std::string(charArray);
 }
 
-
+void reset_all(Disk& in_disk, DiskManager& in_manager, DataReader& in_reader)
+{
+    in_disk.clear();
+    in_manager.reset();
+    in_reader.reset();
+}
 
 int main()
 {
@@ -111,9 +116,15 @@ int main()
         {
             printf("Inicializar presionado\n");
             // Aqu� enlaza Disk, DataReader y l�gica
-            disk.assign_size(numberInputs[0], numberInputs[1], numberInputs[2], numberInputs[3]);
-            data_path = charArrayToString(fileNames[0]);
-            table_data_path = charArrayToString(fileNames[1]);
+            
+            //reset_all(disk, diskManager, dataReader);
+            disk.assign_size(6, 8, 10, 10);
+            //disk.assign_size(numberInputs[0], numberInputs[1], numberInputs[2], numberInputs[3]);
+            //data_path = charArrayToString(fileNames[0]);
+            //table_data_path = charArrayToString(fileNames[1]);
+            data_path = "C:\\Users\\tanuki\\source\\repos\\SGDB_DBII_UI\\source\\taxables.csv";
+            table_data_path = "C:\\Users\\tanuki\\source\\repos\\SGDB_DBII_UI\\source\\struct_table.txt";
+
             std::string data_str = dataReader.read_data(data_path, table_data_path);
             dataReader.write_data(diskManager, data_str, meta_data_path);
             dataReader.debug();
@@ -129,6 +140,10 @@ int main()
             meta_data_info = dataReader.read_all_meta_data(meta_data_path);
             DiskIterator disk_iterator(disk, dataReader.get_register_size());
             allData = disk_iterator.iterateAndExtractRegs(meta_data_info);
+            //for(auto i : dataReader)
+            //finalFields = dataReader.data_info[0];
+            //finalRegs = allData;
+            //showTable = true;
         }
 
         ImGui::Separator();
@@ -142,14 +157,17 @@ int main()
             qm.dataInfo = dataReader.data_info;
             qm.fieldsInfo = allData;
             qm.parseQuery(query);
-            std::vector<std::vector<std::string>>meta_data_info = dataReader.read_meta_data(meta_data_path, qm.idsQueryResult);
-            DiskIterator disk_iterator(disk, dataReader.get_register_size());
-            std::vector<std::vector<std::string>> answer_query = disk_iterator.iterateAndExtractRegs(meta_data_info);
-            qm.specifyFields(answer_query);
-            finalFields = qm.finalFields;
-            finalRegs = qm.finalRegs;
-
-            //dataReader.insert_query(diskManager, qm.tokens1, meta_data_path, data_path);
+            if (qm.typeQuery == "SELECT") {
+                std::vector<std::vector<std::string>>meta_data_info = dataReader.read_meta_data(meta_data_path, qm.idsQueryResult);
+                DiskIterator disk_iterator(disk, dataReader.get_register_size());
+                std::vector<std::vector<std::string>> answer_query = disk_iterator.iterateAndExtractRegs(meta_data_info);
+                qm.specifyFields(answer_query);
+                finalFields = qm.finalFields;
+                finalRegs = qm.finalRegs;
+            }
+            else if (qm.typeQuery == "INSERT") {
+                dataReader.insert_query(diskManager, qm.tokens1, meta_data_path, data_path);
+            }
 
             showTable = true;
         }
