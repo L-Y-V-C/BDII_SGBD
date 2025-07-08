@@ -1,4 +1,5 @@
 #pragma once
+
 #include "MainWindow.g.h"
 #include <winrt/Microsoft.UI.Xaml.Controls.h>
 #include <winrt/Microsoft.UI.Xaml.Input.h>
@@ -13,6 +14,19 @@
 #include <iostream>
 #include <algorithm>
 #include <windows.h>
+
+#include <cctype>
+#include <iomanip>
+
+#include "listRegister.hh"
+#include "interface.hh"
+#include "dataReader.hh"
+#include "queryManager.hh"
+#include "diskIterator.hh"
+
+#include "functions.hh"
+
+#include "tree.hh"
 
 namespace winrt::DiscoSimulador::implementation
 {
@@ -61,15 +75,27 @@ namespace winrt::DiscoSimulador::implementation
         }
     };
 
+    
     struct ConfiguracionDisco {
         std::string numPlatos;
         std::string numSuperficies;
         std::string numPistas;
+        std::string numSector;
+        std::string tamanoSector;
 
-        ConfiguracionDisco(const std::string& platos = "1", const std::string& superficies = "2", const std::string& pistas = "100")
-            : numPlatos(platos), numSuperficies(superficies), numPistas(pistas) {
-        }
+        ConfiguracionDisco(const std::string& platos, 
+            const std::string& superficies = "2", 
+            const std::string& pistas,
+            const std::string& sector,
+            const std::string& tamSector)
+            : numPlatos(platos), 
+            numSuperficies(superficies), 
+            numPistas(pistas),
+            numSector(sector),
+            tamanoSector(tamSector)
+        {}
     };
+    
 
     struct TablaDatos {
         std::vector<std::string> fields;
@@ -96,7 +122,11 @@ namespace winrt::DiscoSimulador::implementation
         void ToggleMetadataButton_Click(Windows::Foundation::IInspectable const& sender,
             Microsoft::UI::Xaml::RoutedEventArgs const& e);
 
-    private:
+    public:
+        std::string numPlatos;
+        std::string numPistas;
+        std::string numSectores;
+        std::string tamanoSector;
         // Nombres de archivos configurables
         std::string nombreArchivoEstructura = "struct_table.txt";
         std::string nombreArchivoCSV = "taxables.csv";
@@ -114,10 +144,6 @@ namespace winrt::DiscoSimulador::implementation
         int currentTrack = 0;
         int currentSector = 0;
         int currentChar = 0;
-
-        // Configuración adicional del disco
-        std::string numSectores = "64";
-        std::string tamanoSector = "512";
 
         // Métodos privados principales
         void EjecutarConsulta();

@@ -1,4 +1,6 @@
-﻿#include "pch.h"
+﻿#pragma once
+
+#include "pch.h"
 #include "MainWindow.xaml.h"
 #if __has_include("MainWindow.g.cpp")
 #include "MainWindow.g.cpp"
@@ -13,9 +15,11 @@ using namespace Windows::Foundation;
 using namespace Windows::System;
 using namespace Windows::UI;
 
+Disk disk(4, 4, 4, 4);
+
 namespace winrt::DiscoSimulador::implementation
 {
-    MainWindow::MainWindow() : configuracion("", "", "")
+    MainWindow::MainWindow()
     {
         InitializeComponent();
         Title(L"Simulador de Disco Duro");
@@ -27,8 +31,8 @@ namespace winrt::DiscoSimulador::implementation
         try
         {
             // Obtener valores de configuración del disco
-            std::string numPlatos = ObtenerValorComboBox(PlatosComboBox());
-            std::string numPistas = ObtenerValorComboBox(PistasComboBox());
+            numPlatos = ObtenerValorComboBox(PlatosComboBox());
+            numPistas = ObtenerValorComboBox(PistasComboBox());
             numSectores = ObtenerValorComboBox(SectoresComboBox());
             tamanoSector = ObtenerValorComboBox(TamanoSectorComboBox());
 
@@ -46,7 +50,7 @@ namespace winrt::DiscoSimulador::implementation
                 nombreArchivoCSV = "taxables.csv";
 
             // Crear configuración (ya no necesitamos superficies, solo platos y pistas)
-            configuracion = ConfiguracionDisco(numPlatos, "2", numPistas);
+            configuracion = ConfiguracionDisco(numPlatos, "2", numPistas, numSectores, tamanoSector);
 
             // Resetear posición del disco
             currentPlate = 0;
