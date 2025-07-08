@@ -113,6 +113,9 @@ public:
 			if (line_counter++ == 0)
 				continue;			
 
+			if (line == "\n" || line == "\0")
+				continue;
+
 			std::vector<std::string> row = get_table_info(line);
 
 
@@ -258,6 +261,33 @@ public:
 		return results;
 	}
 
+	std::vector<std::vector<std::string>> read_all_meta_data(std::string meta_data_path)
+	{
+		std::ifstream file(meta_data_path);
+		std::string line;
+		std::vector<std::vector<std::string>> results;
+		while (std::getline(file, line))
+		{
+			std::istringstream iss(line);
+			std::string id_str;
+			if (!(iss >> id_str))
+				continue;
+			int id_int = std::stoi(id_str);
+
+			
+			std::vector<std::string> result;
+			result.push_back(id_str); // first
+
+			std::string token;
+			while (iss >> token)
+				result.push_back(token);
+
+			results.push_back(result);
+			
+		}
+		return results;
+	}
+
 	std::vector<int> get_field_size() { return data_size; }
 
 	void debug()
@@ -276,28 +306,11 @@ private:
 	{
 		std::vector<std::string> data;
 		std::string palabra;
-		bool parentesis_abierto{ false };
 		bool comillas_abierta{ false };
 
 		char comilla_symbol{ '\0' };
 		for (char c : line)
 		{
-
-			if (c == '(' && !parentesis_abierto)
-			{
-				parentesis_abierto = true;
-				continue;
-			}
-
-			if (c == ')' && parentesis_abierto)
-			{
-				parentesis_abierto = false;
-				continue;
-			}
-
-			if (!parentesis_abierto)
-				continue;
-
 
 			if (((c == '"') || (c == '\'')) && !comillas_abierta)
 			{

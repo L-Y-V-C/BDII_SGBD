@@ -26,8 +26,8 @@ int main()
     DiskManager diskManager(disk);
     DataReader dataReader;
 
-    std::string data_path("data_test.csv"),
-                table_data_path("table_data.csv"),
+    std::string data_path("taxables.csv"),
+                table_data_path("struct_table.txt"),
                 disk_path("disk.txt"),
                 meta_data_path("meta_data.txt");
    
@@ -58,7 +58,9 @@ int main()
 
     
     std::vector<std::vector<std::string>> meta_data_info;
-    meta_data_info = dataReader.read_meta_data(meta_data_path, id_to_find);
+
+    meta_data_info = dataReader.read_all_meta_data(meta_data_path);
+    //meta_data_info = dataReader.read_meta_data(meta_data_path, id_to_find);
 
     std::cout << "Registros buscados:\n";
     for (auto i : id_to_find)

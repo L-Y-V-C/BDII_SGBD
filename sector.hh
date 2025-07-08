@@ -15,6 +15,8 @@ public:
 		data.resize(sectorSize, '\0');
 	}
 
+	void reset() { data.clear(); }
+
 	void print()
 	{
 		std::cout << data << "\n";
