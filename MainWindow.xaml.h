@@ -14,11 +14,13 @@
 #include <iostream>
 #include <algorithm>
 #include <windows.h>
-
 #include <cctype>
 #include <iomanip>
 
-#include "listRegister.hh"
+#include "disk.hh"
+#include "tree.hh"
+
+/*
 #include "interface.hh"
 #include "dataReader.hh"
 #include "queryManager.hh"
@@ -27,6 +29,7 @@
 #include "functions.hh"
 
 #include "tree.hh"
+*/
 
 namespace winrt::DiscoSimulador::implementation
 {
@@ -84,7 +87,7 @@ namespace winrt::DiscoSimulador::implementation
         std::string tamanoSector;
 
         ConfiguracionDisco(const std::string& platos, 
-            const std::string& superficies = "2", 
+            const std::string& superficies, 
             const std::string& pistas,
             const std::string& sector,
             const std::string& tamSector)

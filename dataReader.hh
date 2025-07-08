@@ -10,8 +10,6 @@
 #include <vector>
 #include "diskManager.hh"
 
-
-
 class DataReader
 {
 public:

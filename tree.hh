@@ -12,35 +12,20 @@ public:
     int compType; /*0 int - 1 float - 2 string*/
 
     AVLTree(int in_type) : root(0), compType(in_type) {}
-    int height(Node* node);
-    int balanceFactor(Node* node);
-    Node* rightRotate(Node* y);
-    Node* leftRotate(Node* x);
-    Node* insert(Node* node, Value inValue, int id);
-    Node* minValueNode(Node* node);
-    bool find(Node* root, Value inValue);
-    void insert(Value inValue);
-    bool find(Value inValue);
-    int compare(Node* node, Value inValue);
-    void printTree(Node* node, int space);
-    void insertFromVector(std::vector<std::pair<std::string, int>> dataToTree);
-    void insertWithId(Value inValue, int id);
-    std::vector<int> returnIds(std::string data);
-};
 
-int AVLTree::height(Node* node) {
+int height(Node* node) {
     if (!node)
         return 0;
     return node->height;
 }
 
-int AVLTree::balanceFactor(Node* node) {
+int balanceFactor(Node* node) {
     if (node == nullptr)
         return 0;
     return height(node->left) - height(node->right);
 }
 
-Node* AVLTree::rightRotate(Node* y) {
+Node* rightRotate(Node* y) {
     Node* x = y->left;
     Node* T2 = x->right;
     /*rotation*/
@@ -52,7 +37,7 @@ Node* AVLTree::rightRotate(Node* y) {
     return x;/*new root*/
 }
 
-Node* AVLTree::leftRotate(Node* x) {
+Node* leftRotate(Node* x) {
     Node* y = x->right;
     Node* T2 = y->left;
     /*rotation*/
@@ -63,7 +48,7 @@ Node* AVLTree::leftRotate(Node* x) {
     y->height = max(height(y->left), height(y->right)) + 1;
     return y;/*new root*/
 }
-int AVLTree::compare(Node* node, Value inValue) {
+int compare(Node* node, Value inValue) {
     switch (compType) {
     case 0:
         if (inValue.datInt < node->val.datInt)
@@ -92,7 +77,7 @@ int AVLTree::compare(Node* node, Value inValue) {
     }
 }
 
-Node* AVLTree::insert(Node* node, Value inValue, int id) {
+Node* insert(Node* node, Value inValue, int id) {
     if (!node) {
         Node* newNode = new Node(inValue);
         newNode->ids.push_back(id);
@@ -131,14 +116,14 @@ Node* AVLTree::insert(Node* node, Value inValue, int id) {
     return node;
 }
 
-Node* AVLTree::minValueNode(Node* node) {
+Node* minValueNode(Node* node) {
     Node* current = node;
     while (current->left)
         current = current->left;
     return current;
 }
 
-bool AVLTree::find(Node* root, Value inValue) {
+bool find(Node* root, Value inValue) {
     if (root == nullptr)
         return false;
     if (compare(root, inValue) == 2)
@@ -148,15 +133,11 @@ bool AVLTree::find(Node* root, Value inValue) {
     return find(root->right, inValue);
 }
 
-//void AVLTree::insert(Value inValue) {
-//    root = insert(root, inValue);
-//}
-
-bool AVLTree::find(Value inValue) {
+bool find(Value inValue) {
     return find(root, inValue);
 }
 
-std::vector<int> AVLTree::returnIds(std::string data) {
+std::vector<int> returnIds(std::string data) {
     Value v;
     std::vector<int> result;
     switch (compType) {
@@ -176,7 +157,7 @@ std::vector<int> AVLTree::returnIds(std::string data) {
     return result;
 }
 
-void AVLTree::insertFromVector(std::vector<std::pair<std::string, int>> dataToTree) {
+void insertFromVector(std::vector<std::pair<std::string, int>> dataToTree) {
     for (auto p : dataToTree) {
         Value v;
         switch (compType) {
@@ -194,11 +175,11 @@ void AVLTree::insertFromVector(std::vector<std::pair<std::string, int>> dataToTr
     }
 }
 
-void AVLTree::insertWithId(Value inValue, int id) {
+void insertWithId(Value inValue, int id) {
     root = insert(root, inValue, id);
 }
 
-void AVLTree::printTree(Node* node, int space = 0) {
+void printTree(Node* node, int space = 0) {
     if (node == nullptr)
         return;
     space += 4;
@@ -220,3 +201,4 @@ void AVLTree::printTree(Node* node, int space = 0) {
     std::cout << std::endl;
     printTree(node->left, space);
 }
+};

@@ -8,17 +8,8 @@
 #include <iomanip>
 #include <sstream>
 
-#include "listRegister.hh"
-#include "register.hh"
-#include "interface.hh"
+//#include "pch.h"
 
-#include "dataReader.hh"
-#include "queryManager.hh"
-#include "diskIterator.hh"
-
-#include "functions.hh"
-
-#include "tree.hh"
 
 void reset_all(Disk& in_disk, DiskManager& in_manager, DataReader& in_reader)
 {
@@ -30,6 +21,7 @@ void reset_all(Disk& in_disk, DiskManager& in_manager, DataReader& in_reader)
 
 int main()
 {
+    /*
     Disk disk(4, 4, 8, 20);
     DiskManager diskManager(disk);
     DataReader dataReader;
@@ -103,4 +95,5 @@ int main()
     qm.printTokens();
     printf("\n--------\n");
     //dataReader.debug();
+    */
 }
