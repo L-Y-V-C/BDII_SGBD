@@ -37,6 +37,8 @@ std::string charArrayToString(const char* charArray) {
     return std::string(charArray);
 }
 
+//dataReader.insert_query(diskManager, qm.tokens1, meta_data_path, data_path);
+
 int main()
 {
     // Inicializar GLFW
@@ -108,7 +110,7 @@ int main()
         if (ImGui::Button("Inicializar"))
         {
             printf("Inicializar presionado\n");
-            // Aquí enlaza Disk, DataReader y lógica
+            // Aquï¿½ enlaza Disk, DataReader y lï¿½gica
             Disk disk(numberInputs[0], numberInputs[1], numberInputs[2], numberInputs[3]);
             data_path = charArrayToString(fileNames[0]);
             table_data_path = charArrayToString(fileNames[1]);
@@ -133,7 +135,7 @@ int main()
         if (ImGui::Button("GO"))
         {
             printf("GO presionado: %s\n", queryInput);
-            // Aquí ejecuta consulta y llena finalFields y finalRegs
+            // Aquï¿½ ejecuta consulta y llena finalFields y finalRegs
             query = charArrayToString(queryInput);
             QueryManager qm;
             qm.dataInfo = dataReader.data_info;
