@@ -27,6 +27,8 @@ public:
 		plates.resize(plate_number, Plate(track_number, sector_number, sector_size));
 	}
 
+	int get_total_space() { return total_space; };
+
 	int get_remnant_space() { return total_space - current_char_pos; }
 
 	void print_disk()

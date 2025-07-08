@@ -11,7 +11,10 @@ public:
         disk(d), iterator(d)
     { }
 
-    void next() { iterator.next(); }
+    void next() { 
+        iterator.next();
+        disk.current_char_pos++;
+    }
 
     char& current_char() { return iterator.current_char(); }
 
