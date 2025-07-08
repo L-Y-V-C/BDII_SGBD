@@ -56,6 +56,7 @@ public:
 		for (int i = 0; i < plates.size(); i++)
 			plates[i].clear();
 		plates.clear();
+		current_char_pos = 0;
 	}
 
 	

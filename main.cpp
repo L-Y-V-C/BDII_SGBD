@@ -29,6 +29,8 @@ std::vector<std::string> finalFields;
 std::vector<std::vector<std::string>> finalRegs;
 
 std::vector<std::vector<std::string>> meta_data;
+static bool inicializado = false;
+
 
 std::string charArrayToString(const char* charArray) {
     return std::string(charArray);
@@ -71,11 +73,11 @@ int main()
 
     std::string data_path,
         table_data_path,
-        disk_path("C:\\Users\\tanuki\\source\\repos\\SGDB_DBII_UI\\source\\disk.txt"),
-        meta_data_path("C:\\Users\\tanuki\\source\\repos\\SGDB_DBII_UI\\source\\meta_data.txt");
+        disk_path("C:\\Users\\diego\\source\\repos\\GLFWVisualStudioSetup-master\\source\\disk.txt"),
+        meta_data_path("C:\\Users\\diego\\source\\repos\\GLFWVisualStudioSetup-master\\source\\meta_data.txt");
     std::string query;
 
-    bool showTable = false;
+    bool showTable = true;
     bool showMetaDataPopup = false;
     int metaDataIndex = -1;
 
@@ -109,46 +111,75 @@ int main()
         ImGui::InputText("data", fileNames[0], IM_ARRAYSIZE(fileNames[0]));
         ImGui::InputText("struct", fileNames[1], IM_ARRAYSIZE(fileNames[1]));
 
-        if (ImGui::Button("Inicializar"))
+        if (!inicializado)
         {
-            printf("Inicializar presionado\n");
-            // Aqu� enlaza Disk, DataReader y l�gica
-            
-            //reset_all(disk, diskManager, dataReader);
-            disk.assign_size(6, 8, 10, 10);
-            //disk.assign_size(numberInputs[0], numberInputs[1], numberInputs[2], numberInputs[3]);
-            //data_path = charArrayToString(fileNames[0]);
-            //table_data_path = charArrayToString(fileNames[1]);
-            data_path = "C:\\Users\\tanuki\\source\\repos\\SGDB_DBII_UI\\source\\taxables.csv";
-            table_data_path = "C:\\Users\\tanuki\\source\\repos\\SGDB_DBII_UI\\source\\struct_table.txt";
+            if (ImGui::Button("Inicializar"))
+            {
+                printf("Inicializar presionado\n");
+                // Aqu� enlaza Disk, DataReader y l�gica
 
-            std::string data_str = dataReader.read_data(data_path, table_data_path);
-            dataReader.write_data(diskManager, data_str, meta_data_path);
-            dataReader.debug();
-            dataReader.write_data_on_txt(
-                disk_path,
-                data_str,
-                disk);
-            //std::vector<int> firstIdsToFill;
-            //for (int i = 1; i <= dataReader.register_count; i++) {
-            //    firstIdsToFill.push_back(i);
-            //}
-            std::vector<std::vector<std::string>> meta_data_info;
-            meta_data_info = dataReader.read_all_meta_data(meta_data_path);
-            DiskIterator disk_iterator(disk, dataReader.get_register_size());
-            allData = disk_iterator.iterateAndExtractRegs(meta_data_info);
-            //for(auto i : dataReader)
-            //finalFields = dataReader.data_info[0];
-            //finalRegs = allData;
-            //showTable = true;
+                reset_all(disk, diskManager, dataReader);
+                disk.assign_size(6, 8, 10, 6);
+                //disk.assign_size(numberInputs[0], numberInputs[1], numberInputs[2], numberInputs[3]);
+                //data_path = charArrayToString(fileNames[0]);
+                //table_data_path = charArrayToString(fileNames[1]);
+                data_path = "C:\\Users\\diego\\source\\repos\\GLFWVisualStudioSetup-master\\source\\taxables.csv";
+                table_data_path = "C:\\Users\\diego\\source\\repos\\GLFWVisualStudioSetup-master\\source\\struct_table.txt";
+
+                std::string data_str = dataReader.read_data(data_path, table_data_path);
+                dataReader.write_data(diskManager, data_str, meta_data_path);
+                dataReader.debug();
+                dataReader.write_data_on_txt(
+                    disk_path,
+                    data_str,
+                    disk);
+                //std::vector<int> firstIdsToFill;
+                //for (int i = 1; i <= dataReader.register_count; i++) {
+                //    firstIdsToFill.push_back(i);
+                //}
+                std::vector<std::vector<std::string>> meta_data_info;
+                meta_data_info = dataReader.read_all_meta_data(meta_data_path);
+                DiskIterator disk_iterator(disk, dataReader.get_register_size());
+                allData = disk_iterator.iterateAndExtractRegs(meta_data_info);
+                //for(auto i : dataReader)
+                //finalFields = dataReader.data_info[0];
+                //finalRegs = allData;
+                //showTable = true;
+                inicializado = true;
+
+            }
+
+            ImGui::SameLine();
+            ImGui::BeginDisabled();
+            ImGui::Button("Stop");
+            ImGui::EndDisabled();
         }
+        else
+        {
+            // Botón "Inicializar" deshabilitado
+            ImGui::BeginDisabled();
+            ImGui::Button("Inicializar");
+            ImGui::EndDisabled();
+
+            ImGui::SameLine();
+
+            // Botón "Stop" habilitado
+            if (ImGui::Button("Stop"))
+            {
+                inicializado = false;
+            }
+
+            ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "¡Disco Inicializado!");
+        }
+
 
         ImGui::Separator();
         ImGui::InputText("Consulta", queryInput, IM_ARRAYSIZE(queryInput));
         if (ImGui::Button("GO"))
         {
             printf("GO presionado: %s\n", queryInput);
-            // Aqu� ejecuta consulta y llena finalFields y finalRegs
+            
+            // Aqui ejecuta consulta y llena finalFields y finalRegs
             query = charArrayToString(queryInput);
             QueryManager qm;
             qm.dataInfo = dataReader.data_info;
@@ -161,13 +192,26 @@ int main()
                 std::vector<std::vector<std::string>> answer_query = disk_iterator.iterateAndExtractRegs(meta_data_info);
                 qm.specifyFields(answer_query);
                 finalFields = qm.finalFields;
+
+
+                //for (int i = 0; i < dataReader.data_info.size(); i++)
+                //   finalFields.push_back(dataReader.data_info[i][0]);
+
                 finalRegs = qm.finalRegs;
             }
-            else if (qm.typeQuery == "INSERT") {
+            else if (qm.typeQuery == "INSERT")
+            {
+                std::cout << "ENTRO INSERT\n";
                 dataReader.insert_query(diskManager, qm.tokens1, meta_data_path, data_path);
             }
 
-            showTable = true;
+            std::vector<std::vector<std::string>>meta_data_info = dataReader.read_all_meta_data(meta_data_path);
+            DiskIterator disk_iterator(disk, dataReader.get_register_size());
+            std::vector<std::vector<std::string>> answer_query2 = disk_iterator.iterateAndExtractRegs(meta_data_info);
+            std::cout << "Registros encontrados:\n";
+            print_table(answer_query2, 30);
+
+
         }
 
         if (showTable)
@@ -205,12 +249,28 @@ int main()
 
         if (ImGui::BeginPopupModal("Ver Metadata", NULL, ImGuiWindowFlags_AlwaysAutoResize))
         {
-            ImGui::Text("Ubicacion del registro %d:", metaDataIndex);
-            for (int i = 1; i < meta_data[metaDataIndex].size(); i++)
+            ImGui::Text("Ubicación del registro: ");
+            ImGui::SameLine();
+            ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "%s", finalRegs[metaDataIndex][0].c_str());
+                
+            int nom_index{ 0 };
+
+            std::vector<std::string > names({ "Plato", "Superficie", "Pista", "Sector", "Posicion"});
+
+            for (int i = 1; i < meta_data[metaDataIndex].size(); i++, nom_index++)
             {
-                if (i > 0 && i % 5 == 0)
+                if ((i - 1) % 10 == 0) // Nombre
+                {
                     ImGui::Separator();
-                ImGui::Text("%s", meta_data[metaDataIndex][i].c_str());
+                    ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), dataReader.data_info[(i - 1) / 10][0].c_str());
+                    ImGui::Separator();
+                }
+                    
+                if (i > 0 && (i-1) % 5 == 0)
+                    ImGui::Separator();
+
+                ImGui::Text("%s: %s", names[(i - 1) % 5].c_str(), meta_data[metaDataIndex][i].c_str());
+
             }
             if (ImGui::Button("Cerrar"))
             {
