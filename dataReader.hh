@@ -115,6 +115,8 @@ public:
 
 			std::vector<std::string> row = get_table_info(line);
 
+
+
 			std::string merged_row = merge_data_row(row, data_info, data_size);
 			
 			data_line += merged_row + '/';
@@ -173,6 +175,8 @@ public:
 		int sector_size{ disk.get_sector_size() };
 		int maximum_registers = disk.get_remnant_space() / total_register_size;
 
+		//debug();
+
 
 		int counter{ 0 };
 		for (int i = 0; i < register_count; i++)
@@ -190,30 +194,39 @@ public:
 
 			int register_id = std::stoi(sub_str.substr(0, sub_str.find(',')));
 
+			std::vector<size_t> initial_pos, final_pos;
 
-			// Save positions, before and after inserting a register
-			std::vector<size_t> initial_pos = iterator.get_position();
+			//std::cout << i << " : ";
 
-			for (int j = lower; j < upper; j++, iterator.next(), counter++)
-				iterator.set_data(data[j]);
-
-			std::vector<size_t> final_pos = iterator.get_position();
-
-
-			// Save meta data
 			file << register_id << " ";
-			for (auto i : initial_pos)
-				file << i << " ";
-			
-			for (int i = 0; i < final_pos.size(); i++)
+			for (int j = 0; j < data_size.size(); j++)
 			{
-				file << final_pos[i];
-				if (i == final_pos.size() - 1)
-					file << "\n";
-				else
-					file << " ";
-			}
+				initial_pos = iterator.get_position();
 
+				for (int k = 0; k < data_size[j]; ++k)
+				{
+					iterator.set_data(data[counter]);
+					std::cout << iterator.current_char();
+					iterator.next();
+					counter++;
+				}
+
+				final_pos = iterator.get_position();
+
+				
+				for (auto pos : initial_pos)
+					file << pos << " ";
+
+				for (auto pos : final_pos)
+					file << pos << " ";
+
+
+				counter++;
+				iterator.next();
+			}
+			std::cout << "\n";
+
+			file << "\n";
 		}
 	}
 	
@@ -223,7 +236,8 @@ public:
 		std::ifstream file(meta_data_path);
 		std::string line;
 		std::vector<std::vector<std::string>> results;
-		while (std::getline(file, line)) {
+		while (std::getline(file, line))
+		{
 			std::istringstream iss(line);
 			std::string id_str;
 			if (!(iss >> id_str))
@@ -236,9 +250,9 @@ public:
 				result.push_back(id_str); // first
 
 				std::string token;
-				while (iss >> token) {
+				while (iss >> token)
 					result.push_back(token);
-				}
+
 				results.push_back(result);
 			}
 		}
