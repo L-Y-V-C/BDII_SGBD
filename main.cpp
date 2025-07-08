@@ -58,9 +58,12 @@ int main()
 
     
     std::vector<std::vector<std::string>> meta_data_info;
+    std::vector<std::vector<std::string>> meta_data_info1;
+    std::vector<std::vector<std::string>> meta_data_info2;
+    std::vector<std::vector<std::string>> meta_data_info3;
 
-    meta_data_info = dataReader.read_all_meta_data(meta_data_path);
-    //meta_data_info = dataReader.read_meta_data(meta_data_path, id_to_find);
+    meta_data_info1 = dataReader.read_all_meta_data(meta_data_path);
+    meta_data_info2 = dataReader.read_meta_data(meta_data_path, id_to_find);
 
     std::cout << "Registros buscados:\n";
     for (auto i : id_to_find)
@@ -68,7 +71,7 @@ int main()
     std::cout << "\n\n\n";
     
     std::cout << "Meta data encontrada:\n";
-    for (auto i : meta_data_info)
+    for (auto i : meta_data_info2)
     {
         for (auto j : i)
             std::cout << j << " ";
@@ -80,7 +83,7 @@ int main()
     // TEST PRUEBA EXTRACION DE REGISTROS DE METADATA
     DiskIterator disk_iterator(disk, dataReader.get_register_size());  // , dataReader.get_field_size());
 
-    std::vector<std::vector<std::string>> answer_query = disk_iterator.iterateAndExtractRegs(meta_data_info);
+    std::vector<std::vector<std::string>> answer_query = disk_iterator.iterateAndExtractRegs(meta_data_info1);
 
     std::cout << "Registros encontrados:\n";
     print_table(answer_query, 50);
@@ -89,10 +92,11 @@ int main()
     //dataReader.debug();
     QueryManager qm;
     qm.dataInfo = dataReader.data_info;
+    qm.fieldsInfo = answer_query;
     //std::string q5 = "SELECT item, id FROM PRODUCTO WHERE item = \"Fruit of the Loom Girl's Socks\"";
    // std::string q5 = "SELECT item, id FROM PRODUCTO WHERE cost = 10.00";
-    //std::string q5 = "SELECT name, id FROM tabla";
-    std::string q5 = "INSERT INTO PRODUCTO VALUES(12, \"Fruit of the Loom Girl's Socks\", 123.54, 32.42, 321.10)";
+
+    std::string q5 = "INSERT INTO PRODUCTO VALUES(11, \"Fruit of the Loom Girl's Socks\", 123.54, 32.42, 321.10)";
     qm.parseQuery(q5);
     qm.printTokens();   
 
@@ -112,9 +116,29 @@ int main()
 
     printf("\n--------\n");
 
+    
     answer_query = disk_iterator.iterateAndExtractRegs(meta_data_info);
 
     std::cout << "Registros encontrados:\n";
     print_table(answer_query, 50);
+
+    
+    qm.printTokens();
+    printf("\n--------------------------------------------------\n");
+
+
+    q5 = "SELECT index, item, tax FROM PRODUCTO WHERE index = 1.12";
+    qm.parseQuery(q5);
+
+    meta_data_info3 = dataReader.read_meta_data(meta_data_path, qm.idsQueryResult);
+
+    std::vector<std::vector<std::string>> answer_query2 = disk_iterator.iterateAndExtractRegs(meta_data_info3);
+
+
+    std::cout << "Registros encontrados:\n";
+    print_table(answer_query2, 30);
+
+    qm.specifyFields(answer_query2);
+
     //dataReader.debug();
 }
