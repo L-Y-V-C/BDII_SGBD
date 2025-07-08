@@ -83,14 +83,15 @@ int main()
     std::vector<std::vector<std::string>> answer_query = disk_iterator.iterateAndExtractRegs(meta_data_info);
 
     std::cout << "Registros encontrados:\n";
-    print_table(answer_query, 50);
+    //print_table(answer_query, 50);
 
     printf("\n--------\n");
     //dataReader.debug();
     QueryManager qm;
     qm.dataInfo = dataReader.data_info;
+    qm.fieldsInfo = answer_query;
     //std::string q5 = "SELECT item, id FROM PRODUCTO WHERE item = \"Fruit of the Loom Girl's Socks\"";
-    std::string q5 = "SELECT item, id FROM PRODUCTO WHERE cost = 10.00";
+    std::string q5 = "SELECT item, id FROM PRODUCTO WHERE tax = 1.12";
     //std::string q5 = "SELECT name, id FROM tabla";
     //std::string q5 = "INSERT INTO PRODUCTO VALUES(12, \"Fruit of the Loom Girl's Socks\", 123.54)";
     qm.parseQuery(q5);

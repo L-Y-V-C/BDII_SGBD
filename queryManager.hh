@@ -118,6 +118,7 @@ public:
                 treeType = 2;
         }
         AVLTree tree(treeType);
+
         if (tokens2.empty()) {
             tokens2[1] = dataInfo[0][0];
         }
@@ -131,6 +132,26 @@ public:
         }
         tree.insertFromVector(dataToTree);
         idsQueryResult = tree.returnIds(tokens2.back());
+        tree.printTree(tree.root);
+        printf("\nQUERY RESULT\n");
+        for (auto i : idsQueryResult)
+            std::cout << i << " ";
+        printf("\nEND\n");
+    }
+    void myTrim(std::string& s) {
+        const std::string whitespace = " \t\n\r\f\v";
+        s.erase(s.find_last_not_of(whitespace) + 1);
+        s.erase(0, s.find_first_not_of(whitespace));
+        while (!s.empty() && s.back() == '\0') {
+            s.pop_back();
+        }
+    }
+    void cleanFieldsInfo() {
+        for (int i = 0; i < fieldsInfo.size(); i++) {
+            for (int j = 0; j < fieldsInfo[i].size(); j++) {
+                myTrim(fieldsInfo[i][j]);
+            }
+        }
     }
     void parseInsert(std::string query) {
         typeQuery = "INSERT";
