@@ -5,6 +5,7 @@
 class DiskIterator
 {
 public:
+
     DiskIterator(Disk& d, int in_reg_size = 0) :
         disk(d), plateIndex(0), surfaceIndex(0), trackIndex(0), sectorIndex(0), char_index(0), regSize(in_reg_size)
     { }

@@ -19,7 +19,13 @@ public:
 		for (int i = 0; i < surfaces.size(); i++)
 		{
 			surfaces[i].print();
-		}	
+		}
+	}
+	void clear()
+	{
+		for (int i = 0; i < surfaces.size(); i++)
+			surfaces[i].clear();
+		surfaces.clear();
 	}
 };
 

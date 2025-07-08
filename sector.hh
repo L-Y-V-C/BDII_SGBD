@@ -15,7 +15,7 @@ public:
 		data.resize(sectorSize, '\0');
 	}
 
-	void reset() { data.clear(); }
+	void clear() { data.clear(); };
 
 	void print()
 	{

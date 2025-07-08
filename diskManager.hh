@@ -6,7 +6,7 @@
 class DiskManager
 {
 public:
-
+    
     DiskManager(Disk& d) :
         disk(d), iterator(d)
     { }
