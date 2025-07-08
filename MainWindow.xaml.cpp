@@ -28,8 +28,7 @@ namespace winrt::DiscoSimulador::implementation
 
     void MainWindow::InicializarButton_Click(IInspectable const&, RoutedEventArgs const&)
     {
-        try
-        {
+        try {
             // Obtener valores de configuración del disco
             numPlatos = winrt::to_string(PlatosComboBox().Text());
             numPistas = winrt::to_string(PistasComboBox().Text());
@@ -42,8 +41,6 @@ namespace winrt::DiscoSimulador::implementation
             //DISK MANAGER -------------------------------------------------------------
             DiskManager diskManager(disk);
             DataReader dataReader;
-
-            
 
             // Obtener nombres de archivos de los TextBox
             std::wstring estructuraW = ArchivoEstructuraTextBox().Text().c_str();
@@ -58,9 +55,14 @@ namespace winrt::DiscoSimulador::implementation
             if (nombreArchivoCSV.empty())
                 nombreArchivoCSV = "taxables.csv";
 
-            // read files --------------------------------------------------------
+            // read and write files --------------------------------------------------------
             std::string data_str = dataReader.read_data(nombreArchivoCSV, nombreArchivoEstructura);
 
+            dataReader.write_data(diskManager, data_str, meta_data_path);
+            dataReader.write_data_on_txt(
+                disk_path,
+                data_str,
+                disk);
 
             // Crear configuración (ya no necesitamos superficies, solo platos y pistas)
             configuracion = ConfiguracionDisco(numPlatos, "2", numPistas, numSectores, tamanoSector);
@@ -102,6 +104,7 @@ namespace winrt::DiscoSimulador::implementation
         {
             MostrarError("Error al inicializar el disco duro.");
         }
+        
     }
 
     void MainWindow::EjecutarButton_Click(IInspectable const&, RoutedEventArgs const&)
