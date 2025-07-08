@@ -8,20 +8,12 @@
 #include <iomanip>
 #include <sstream>
 
-#include "listRegister.hh"
-#include "register.hh"
-#include "interface.hh"
+//#include "pch.h"
 
-#include "dataReader.hh"
-#include "queryManager.hh"
-#include "diskIterator.hh"
-
-#include "functions.hh"
-
-#include "tree.hh"
 
 int main()
 {
+    /*
     Disk disk(4, 4, 8, 20);
     DiskManager diskManager(disk);
     DataReader dataReader;
@@ -95,4 +87,5 @@ int main()
     qm.printTokens();
     printf("\n--------\n");
     //dataReader.debug();
+    */
 }

@@ -15,11 +15,11 @@ using namespace Windows::Foundation;
 using namespace Windows::System;
 using namespace Windows::UI;
 
-Disk disk(4, 4, 4, 4);
+//Disk disk(4, 4, 4, 4);
 
 namespace winrt::DiscoSimulador::implementation
 {
-    MainWindow::MainWindow()
+    MainWindow::MainWindow() : configuracion("", "", "", "", "")
     {
         InitializeComponent();
         Title(L"Simulador de Disco Duro");
