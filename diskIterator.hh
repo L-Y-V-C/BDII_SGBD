@@ -110,7 +110,7 @@ public:
             .tracks[trackIndex].sectors[sectorIndex].data[char_index];
     }
 
-private:
+public:
     Disk& disk;
     std::vector<int> fieldSizes;
     int regSize;

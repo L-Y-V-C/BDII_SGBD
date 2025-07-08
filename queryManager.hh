@@ -106,11 +106,14 @@ public:
             tokens2.push_back(comparador);
             tokens2.push_back(valor);
         }
-        for (auto i : tokens2) {
-            if (i == "WHERE") {
-                checkType();
+        if (!tokens2.empty()) {
+            for (auto i : tokens2) {
+                if (i == "WHERE") {
+                    checkType();
+                }
             }
         }
+        
         if (typeToTree != "") {
             if (typeToTree == "INTEGER" || typeToTree == "BOOL" || typeToTree == "BOOLEAN")
                 treeType = 0;
@@ -121,11 +124,13 @@ public:
         }
         AVLTree tree(treeType);
         if (tokens2.empty()) {
-            tokens2[1] = dataInfo[0][0];
+            tokens2.push_back("");
+            tokens2.push_back(dataInfo[0][0]);
         }
+
         for (int i = 0; i < fieldsInfo.size(); i++) {
             for (int j = 0; j < fieldsInfo[i].size(); j++) {
-                if (tokens2[1] == dataInfo[j][0]) {
+                if (tokens2.size() > 1 && tokens2[1] == dataInfo[j][0]) {
                     int id = std::stoi(fieldsInfo[i][0]);
                     dataToTree.push_back({ fieldsInfo[i][j], id });
                 }
@@ -133,11 +138,7 @@ public:
         }
         tree.insertFromVector(dataToTree);
         idsQueryResult = tree.returnIds(tokens2.back());
-        tree.printTree(tree.root);
-        printf("\nQUERY RESULT\n");
-        for (auto i : idsQueryResult)
-            std::cout << i << " ";
-        printf("\nEND\n");
+        //tree.printTree(tree.root);
     }
     void myTrim(std::string& s) {
         const std::string whitespace = " \t\n\r\f\v";
