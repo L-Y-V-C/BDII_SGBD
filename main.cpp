@@ -35,7 +35,15 @@ int main()
     std::string data_str = dataReader.read_data(data_path, table_data_path);
     
     std::cout << "Tabla: " << dataReader.table_name << "\n\n";
-    std::cout << data_str << "\n\n";
+
+    for (auto c : data_str)
+    {
+        if (c == '\0')
+            std::cout << "-";
+        else
+            std::cout << c;
+    }
+    std::cout << "\n";
 
     dataReader.write_data(diskManager, data_str, meta_data_path);
     dataReader.write_data_on_txt(
@@ -44,10 +52,11 @@ int main()
                                  disk);
     //disk.print_disk();
 
+    
 
     std::vector<int> id_to_find{ 1, 3, 4, 11 };
 
-
+    
     std::vector<std::vector<std::string>> meta_data_info;
     meta_data_info = dataReader.read_meta_data(meta_data_path, id_to_find);
 
@@ -55,7 +64,7 @@ int main()
     for (auto i : id_to_find)
         std::cout << i << " ";
     std::cout << "\n\n\n";
-
+    
     std::cout << "Meta data encontrada:\n";
     for (auto i : meta_data_info)
     {
@@ -64,21 +73,15 @@ int main()
         std::cout << "\n\n";
     }
     std::cout << "\n";
-
+    
    
     // TEST PRUEBA EXTRACION DE REGISTROS DE METADATA
     DiskIterator disk_iterator(disk, dataReader.get_register_size());  // , dataReader.get_field_size());
 
-    std::vector<std::string> answer_query;
-    answer_query = disk_iterator.iterateAndExtractRegs(meta_data_info);
-
-    std::vector<std::vector<std::string>> query_separated;
-    for (int i = 0; i < answer_query.size(); i++)
-        query_separated.push_back(separate_string(answer_query[i], ','));
-
+    std::vector<std::vector<std::string>> answer_query = disk_iterator.iterateAndExtractRegs(meta_data_info);
 
     std::cout << "Registros encontrados:\n";
-    print_table(query_separated, 50);
+    print_table(answer_query, 50);
 
     printf("\n--------\n");
     //dataReader.debug();
@@ -92,5 +95,5 @@ int main()
     qm.printTokens();
     printf("\n--------\n");
     //dataReader.debug();
-
+    
 }

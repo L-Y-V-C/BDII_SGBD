@@ -35,34 +35,36 @@ public:
     std::vector<std::vector<int>> receiveIndexesFromMetadata(std::vector<std::vector<std::string>> inVector)
     {
         std::vector<std::vector<int>> positions(inVector.size());
-        for (int i = 0; i < inVector.size(); ++i) {
+        for (int i = 0; i < inVector.size(); ++i)
+        {
             positions[i].resize(inVector[i].size());
-            for (int j = 0; j < inVector[i].size(); ++j) {
+            for (int j = 0; j < inVector[i].size(); ++j)
                 positions[i][j] = std::stoi(inVector[i][j]);
-            }
         }
         return positions;
     }
 
-    std::vector<std::string> iterateAndExtractRegs(std::vector<std::vector<std::string>> inVector)
+    std::vector<std::vector<std::string>> iterateAndExtractRegs(std::vector<std::vector<std::string>> inVector)
     {
-        std::vector<std::string> result(inVector.size());
+        std::vector<std::vector<std::string>> result(inVector.size());
+
         std::vector<std::vector<int>> positions;
         positions = receiveIndexesFromMetadata(inVector);
 
-        int half = (positions[0].size() - 1) / 2;
-        std::vector<int> startIndexes(half, 0);
-        std::vector<int> endIndexes(half, 0);
+        int fields_limit = (positions[0].size() - 1) / 10;
+        for (int i = 0; i < inVector.size(); i++)
+        {
+            for (int j = 0; j < fields_limit; j++)
+            {
+                int start = (10 * j) + 1;
 
-        for (int i = 0; i < positions.size(); i++) {
-            std::vector<int> startIndexes(positions[i].begin() + 1, positions[i].begin() + 1 + half);
-            std::vector<int> endIndexes(positions[i].begin() + 1 + half, positions[i].end());
-            result[i] = extractReg(startIndexes, endIndexes);
-
-
-            result[i] = result[i].substr(0, result[i].length() - 1); //To delete register separator ('/')
-
+                std::vector<int> startIndexes({positions[i][start], positions[i][start + 1], positions[i][start + 2], positions[i][start + 3], positions[i][start + 4] });
+                std::vector<int> endIndexes({ positions[i][start + 5], positions[i][start + 5 + 1], positions[i][start + 5 + 2], positions[i][start + 5 + 3], positions[i][start + 5 + 4] });
+                result[i].push_back(extractReg(startIndexes, endIndexes));
+            }
         }
+
+        
         return result;
     }
 
@@ -70,11 +72,33 @@ public:
     {
         std::string result = "";
         setIndexes(start);
-        char cc;
-        for (int i = 0; i < regSize; i++) {
+        
+        char cc{'\0'};
+
+        while (true)
+        {
+            // Check if finished
+            bool equal{ true };
+
+            std::vector<size_t> cur_pos = get_position();
+
+
+            for (int j = 0; j < cur_pos.size(); j++)
+            {
+                if (cur_pos[j] != end[j]) // Llegó al final
+                {
+                    equal = false;
+                    break;
+                }
+            }
+
+            if (equal)
+                break;
+
             cc = current_char();
             result.push_back(cc);
             next();
+
         }
         return result;
     }
