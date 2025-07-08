@@ -5,22 +5,26 @@
 #include <vector>
 #include <sstream>
 #include <algorithm>
+#include <utility>
 
 #include "tree.hh"
 
 class QueryManager
 {
 public:
-    std::vector<std::string> tokens;
+    std::string typeQuery = "";
+    std::vector<std::string> tokens1;
+    std::vector<std::string> tokens2;
     std::string tableName = "";
     std::string typeToTree = "";
     std::string fieldToTree = "";
+    std::vector<std::pair<std::string, int>> dataToTree;
     std::vector<std::vector<std::string>> dataInfo;
+    std::vector<std::vector<std::string>> fieldsInfo;
+    std::vector<int> idsQueryResult;
     int treeType = 0;
 
     void parseQuery(std::string query) {
-        tokens.clear();
-
         std::string trimmed = trim(query);
         if (startsWith(trimmed, "SELECT")) {
             parseSelect(trimmed);
@@ -33,10 +37,16 @@ public:
         }
     }
     void printTokens() {
-        std::cout << tableName << "\n";
-        for (std::string t : tokens) {
-            std::cout << t << "\n";
+        std::cout << "tablename: " << tableName <<
+            "\ntypeQuery: " << typeQuery << "\ntokens 1:\n";
+        for (std::string t : tokens1) {
+            std::cout << t << " ";
         }
+        std::cout << "\ntokens 2:\n";
+        for (std::string t : tokens2) {
+            std::cout << t << " ";
+        }
+        printf("\n");
     }
     std::string trim(std::string& str) {
         std::size_t first = str.find_first_not_of(" \t\n\r");
@@ -48,7 +58,7 @@ public:
             std::equal(prefix.begin(), prefix.end(), str.begin());
     }
     void parseSelect(std::string query) {
-        tokens.push_back("SELECT");
+        typeQuery = "SELECT";
 
         std::size_t fromPos = query.find("FROM");
         if (fromPos == std::string::npos)
@@ -59,7 +69,7 @@ public:
         std::istringstream iss(fields);
         std::string field;
         while (std::getline(iss, field, ',')) {
-            tokens.push_back(trim(field));
+            tokens1.push_back(trim(field));
         }
 
         // extract table name
@@ -69,11 +79,11 @@ public:
 
         std::size_t wherePos = query.find("WHERE");
         if (wherePos != std::string::npos) {
-            tokens.push_back("WHERE");
+            tokens2.push_back("WHERE");
             std::string cond = query.substr(wherePos + 5); // skip "WHERE"
             cond = trim(cond);
 
-            // Extraer campo, comparador y valor de forma robusta
+            // extract after WHERE
             std::istringstream iss3(cond);
             std::string campo, comparador, valor;
 
@@ -90,11 +100,11 @@ public:
                 iss3 >> valor;
             }
 
-            tokens.push_back(campo);
-            tokens.push_back(comparador);
-            tokens.push_back(valor);
+            tokens2.push_back(campo);
+            tokens2.push_back(comparador);
+            tokens2.push_back(valor);
         }
-        for (auto i : tokens) {
+        for (auto i : tokens2) {
             if (i == "WHERE") {
                 checkType();
             }
@@ -108,9 +118,22 @@ public:
                 treeType = 2;
         }
         AVLTree tree(treeType);
+        if (tokens2.empty()) {
+            tokens2[1] = dataInfo[0][0];
+        }
+        for (int i = 0; i < fieldsInfo.size(); i++) {
+            for (int j = 0; j < fieldsInfo[i].size(); j++) {
+                if (tokens2[1] == dataInfo[j][0]) {
+                    int id = std::stoi(fieldsInfo[i][0]);
+                    dataToTree.push_back({ fieldsInfo[i][j], id });
+                }
+            }
+        }
+        tree.insertFromVector(dataToTree);
+        idsQueryResult = tree.returnIds(tokens2.back());
     }
     void parseInsert(std::string query) {
-        tokens.push_back("INSERT");
+        typeQuery = "INSERT";
 
         std::size_t intoPos = query.find("INTO");
         if (intoPos == std::string::npos)
@@ -137,19 +160,13 @@ public:
             if (!value.empty() && value.front() == '"' && value.back() == '"') {
                 value = value.substr(1, value.size() - 2);
             }
-            tokens.push_back(value);
-        }
-    }
-    void createTree() {
-        for (auto i : tokens) {
-            if (i == "WHERE")
-                printf("\nfind WHERE\n");
+            tokens1.push_back(value);
         }
     }
     void checkType() {
-        for (int i = 0; i < tokens.size(); i++) {
-            if (tokens[i] == "WHERE") {
-                fieldToTree = tokens[i + 1];
+        for (int i = 0; i < tokens2.size(); i++) {
+            if (tokens2[i] == "WHERE") {
+                fieldToTree = tokens2[i + 1];
                 break;
             }
         }

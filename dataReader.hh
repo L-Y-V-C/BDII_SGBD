@@ -176,8 +176,7 @@ public:
 		int maximum_registers = disk.get_remnant_space() / total_register_size;
 
 		//debug();
-
-
+    
 		int counter{ 0 };
 		for (int i = 0; i < register_count; i++)
 		{
@@ -342,7 +341,7 @@ private:
 	{
 		std::vector<std::string> row;
 		std::string palabra;
-		bool dentro_paréntesis{ false };
+		bool dentro_parÃ©ntesis{ false };
 
 		for (char c : line) {
 			if (std::isalnum(c) || c == '_')
@@ -350,18 +349,18 @@ private:
 
 			else if (c == '(')
 			{
-				dentro_paréntesis = true;
+				dentro_parÃ©ntesis = true;
 				palabra += c;
 			}
 			else if (c == ')')
 			{
 				palabra += c;
-				dentro_paréntesis = false;
+				dentro_parÃ©ntesis = false;
 			}
-			else if (c == ',' && dentro_paréntesis) {
+			else if (c == ',' && dentro_parÃ©ntesis) {
 				palabra += c;  
 			}
-			else if (!dentro_paréntesis)
+			else if (!dentro_parÃ©ntesis)
 			{
 				if (!palabra.empty())
 				{
