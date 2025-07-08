@@ -21,6 +21,9 @@ public:
 
     Disk& get_disk() { return disk; }
 
+    void reset()
+    { iterator.setIndexes({ 0, 0, 0, 0, 0 }); }
+
 private:
     Disk& disk;
     DiskIterator iterator;

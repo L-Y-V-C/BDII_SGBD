@@ -21,6 +21,16 @@ public:
 			sectors[i].print();
 		}
 	}
+
+	void clear()
+	{
+		for (int i = 0; i < sectors.size(); i++)
+			sectors[i].clear();
+		
+		sectors.clear();
+
+	}
+
 };
 
 #endif
