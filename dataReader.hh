@@ -341,7 +341,7 @@ private:
 	{
 		std::vector<std::string> row;
 		std::string palabra;
-		bool dentro_paréntesis{ false };
+		bool dentro_parentesis{ false };
 
 		for (char c : line) {
 			if (std::isalnum(c) || c == '_')
@@ -349,18 +349,18 @@ private:
 
 			else if (c == '(')
 			{
-				dentro_paréntesis = true;
+				dentro_parentesis = true;
 				palabra += c;
 			}
 			else if (c == ')')
 			{
 				palabra += c;
-				dentro_paréntesis = false;
+				dentro_parentesis = false;
 			}
-			else if (c == ',' && dentro_paréntesis) {
+			else if (c == ',' && dentro_parentesis) {
 				palabra += c;  
 			}
-			else if (!dentro_paréntesis)
+			else if (!dentro_parentesis)
 			{
 				if (!palabra.empty())
 				{
