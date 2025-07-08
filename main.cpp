@@ -78,6 +78,7 @@ int main()
     std::string query;
 
     bool showTable = true;
+    bool select = false;
     bool showMetaDataPopup = false;
     int metaDataIndex = -1;
 
@@ -147,6 +148,7 @@ int main()
                 //showTable = true;
                 inicializado = true;
 
+
             }
 
             ImGui::SameLine();
@@ -186,36 +188,50 @@ int main()
             qm.fieldsInfo = allData;
             qm.parseQuery(query);
             if (qm.typeQuery == "SELECT") {
+
+                finalFields.clear();
+                finalRegs.clear();
+
                 std::vector<std::vector<std::string>>meta_data_info = dataReader.read_meta_data(meta_data_path, qm.idsQueryResult);
                 meta_data = meta_data_info;
                 DiskIterator disk_iterator(disk, dataReader.get_register_size());
                 std::vector<std::vector<std::string>> answer_query = disk_iterator.iterateAndExtractRegs(meta_data_info);
-                qm.specifyFields(answer_query);
-                finalFields = qm.finalFields;
 
 
-                //for (int i = 0; i < dataReader.data_info.size(); i++)
-                //   finalFields.push_back(dataReader.data_info[i][0]);
+                //qm.specifyFields(answer_query);
+                //finalFields = qm.finalFields;
 
-                finalRegs = qm.finalRegs;
+                finalRegs = answer_query;
+                select = true;
             }
             else if (qm.typeQuery == "INSERT")
             {
                 std::cout << "ENTRO INSERT\n";
                 dataReader.insert_query(diskManager, qm.tokens1, meta_data_path, data_path);
+                select = false;
+                std::vector<std::vector<std::string>>meta_data_info = dataReader.read_all_meta_data(meta_data_path);
+                DiskIterator disk_iterator(disk, dataReader.get_register_size());
+                finalRegs = disk_iterator.iterateAndExtractRegs(meta_data_info);
+                meta_data = meta_data_info;
             }
-
-            std::vector<std::vector<std::string>>meta_data_info = dataReader.read_all_meta_data(meta_data_path);
-            DiskIterator disk_iterator(disk, dataReader.get_register_size());
-            std::vector<std::vector<std::string>> answer_query2 = disk_iterator.iterateAndExtractRegs(meta_data_info);
-            std::cout << "Registros encontrados:\n";
-            print_table(answer_query2, 30);
-
-
         }
 
         if (showTable)
         {
+            finalFields.clear();
+            for (int i = 0; i < dataReader.data_info.size(); i++)
+                finalFields.push_back(dataReader.data_info[i][0]);
+
+            // Solo cargar todos los datos si aún no hay datos cargados
+            if (finalRegs.empty() && inicializado)
+            {
+                std::vector<std::vector<std::string>>meta_data_info = dataReader.read_all_meta_data(meta_data_path);
+                DiskIterator disk_iterator(disk, dataReader.get_register_size());
+                finalRegs = disk_iterator.iterateAndExtractRegs(meta_data_info);
+                meta_data = meta_data_info;
+            }
+                
+
             ImGui::Separator();
             ImGui::Text("Resultados de Consulta:");
             if (ImGui::BeginTable("Table", finalFields.size() + 1, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
