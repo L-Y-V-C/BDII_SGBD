@@ -32,6 +32,25 @@ public:
 		}
 	}
 
+	void assign_size(int in_plate_number, int in_track_number, int in_sector_number, int in_sector_size)
+	{
+		plate_number = in_plate_number;
+		track_number = in_track_number;
+		sector_number = in_sector_number;
+		sector_size = in_sector_size;
+		current_char_pos = 0;
+
+		total_space = plate_number * 2 * track_number * sector_number * sector_size;
+		plates.resize(plate_number, Plate(track_number, sector_number, sector_size));
+	}
+
+	void clear()
+	{
+		for (int i = 0; i < plates.size(); i++)
+			plates[i].clear();
+		plates.clear();
+	}
+
 	int get_sector_size() { return sector_size; }
 private:
 	int plate_number, track_number, sector_number, sector_size;

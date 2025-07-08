@@ -109,6 +109,15 @@ public:
             .tracks[trackIndex].sectors[sectorIndex].data[char_index];
     }
 
+    void setIndexes(std::vector<int> Indexes)
+    {
+        plateIndex = Indexes[0];
+        surfaceIndex = Indexes[1];
+        trackIndex = Indexes[2];
+        sectorIndex = Indexes[3];
+        char_index = Indexes[4];
+    }
+
 private:
     Disk& disk;
     std::vector<int> fieldSizes;
@@ -160,14 +169,6 @@ private:
         }
     }
 
-    void setIndexes(std::vector<int> Indexes)
-    {
-        plateIndex = Indexes[0];
-        surfaceIndex = Indexes[1];
-        trackIndex = Indexes[2];
-        sectorIndex = Indexes[3];
-        char_index = Indexes[4];
-    }
 
     void resetIndexes()
     {
@@ -178,7 +179,5 @@ private:
     {
         return plateIndex >= disk.plates.size();
     }
-
-    
 
 };

@@ -20,6 +20,14 @@
 
 #include "tree.hh"
 
+void reset_all(Disk& in_disk, DiskManager& in_manager, DataReader& in_reader)
+{
+
+    in_disk.clear();
+    in_manager.reset();
+    in_reader.reset();
+}
+
 int main()
 {
     Disk disk(4, 4, 8, 20);

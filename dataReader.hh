@@ -271,6 +271,15 @@ public:
 
 	size_t get_register_size() { return total_register_size; }
 
+	void reset()
+	{
+		data_info.clear();
+		data_size.clear();
+		total_register_size = 0;
+		register_count = 0;
+		table_name.clear();
+	}
+
 private:
 	std::vector<std::string> get_table_info(std::string& line)
 	{
