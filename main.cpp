@@ -90,11 +90,31 @@ int main()
     QueryManager qm;
     qm.dataInfo = dataReader.data_info;
     //std::string q5 = "SELECT item, id FROM PRODUCTO WHERE item = \"Fruit of the Loom Girl's Socks\"";
-    std::string q5 = "SELECT item, id FROM PRODUCTO WHERE cost = 10.00";
+   // std::string q5 = "SELECT item, id FROM PRODUCTO WHERE cost = 10.00";
     //std::string q5 = "SELECT name, id FROM tabla";
-    //std::string q5 = "INSERT INTO PRODUCTO VALUES(12, \"Fruit of the Loom Girl's Socks\", 123.54)";
+    std::string q5 = "INSERT INTO PRODUCTO VALUES(12, \"Fruit of the Loom Girl's Socks\", 123.54, 32.42, 321.10)";
     qm.parseQuery(q5);
-    qm.printTokens();
+    qm.printTokens();   
+
+    dataReader.insert_query(diskManager, qm.tokens1, meta_data_path);
+
+    meta_data_info = dataReader.read_all_meta_data(meta_data_path);
+    //meta_data_info = dataReader.read_meta_data(meta_data_path, id_to_find);
+
+    std::cout << "Meta data encontrada:\n";
+    for (auto i : meta_data_info)
+    {
+        for (auto j : i)
+            std::cout << j << " ";
+        std::cout << "\n\n";
+    }
+    std::cout << "\n";
+
     printf("\n--------\n");
+
+    answer_query = disk_iterator.iterateAndExtractRegs(meta_data_info);
+
+    std::cout << "Registros encontrados:\n";
+    print_table(answer_query, 50);
     //dataReader.debug();
 }

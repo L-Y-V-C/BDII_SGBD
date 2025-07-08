@@ -23,6 +23,9 @@ public:
 	}
 
 	int get_remnant_space() { return total_space - current_char_pos; }
+	int get_total_space() { return total_space; };
+
+
 
 	void print_disk()
 	{

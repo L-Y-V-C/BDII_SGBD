@@ -232,6 +232,79 @@ public:
 		}
 	}
 	
+	void insert_query(DiskManager& iterator, std::vector<std::string>& data, std::string meta_data_path)
+	{
+		std::ofstream file(meta_data_path, std::ios::app);
+
+		if (!file.is_open())
+		{
+			std::cerr << "Error al abrir el archivo " << meta_data_path << '\n';
+			return;
+		}
+
+		Disk& disk = iterator.get_disk();
+		int sector_size{ disk.get_sector_size() };
+		int maximum_registers = disk.get_remnant_space() / total_register_size;
+		int current_registers = (disk.get_total_space() - disk.get_remnant_space())/ total_register_size;
+
+
+		//debug();
+
+		int counter{ 0 };
+		
+		if (current_registers + 1 >= maximum_registers)
+		{
+			std::cerr << "No se pudieron escribir todos los registros!, escrito hasta el registro: " << current_registers << "\n";
+			return;
+		}
+
+
+		file << data[0] << " ";
+
+		for (int i = 0; i < data_size.size(); i++)
+		{
+			std::string& type = data_info[i][1];
+			std::string& number = data_info[i][2];
+			std::string& value = data[i];
+			int limit = data_size[i];
+
+
+			//ENCODE
+			std::string encoded = encode_value(type, number, limit, value);
+
+			if (i == (data_size.size() - 1)) //ultimo
+				encoded += '/';
+			else
+				encoded += ',';
+
+
+			std::vector<size_t> initial_pos = iterator.get_position();
+
+			for (int k = 0; k < data_size[i]; ++k)
+			{
+				iterator.set_data(encoded[k]);
+				std::cout << iterator.current_char();
+				iterator.next();
+				counter++;
+			}
+
+			std::vector<size_t> final_pos = iterator.get_position();
+
+
+			for (auto pos : initial_pos)
+				file << pos << " ";
+
+			for (auto pos : final_pos)
+				file << pos << " ";
+
+			counter++;
+			iterator.next();
+		}
+		std::cout << "\n";
+		file << "\n";
+		
+	}
+
 	// extract data from metadata file
 	std::vector<std::vector<std::string>> read_meta_data(std::string meta_data_path, std::vector<int> in_ids)
 	{
