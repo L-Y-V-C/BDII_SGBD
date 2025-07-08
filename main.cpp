@@ -28,10 +28,7 @@
 std::vector<std::string> finalFields;
 std::vector<std::vector<std::string>> finalRegs;
 
-std::vector<std::vector<std::string>> meta_data = {
-    {"block0", "sector0", "pos0", "size0", "extra0"},
-    {"block1", "sector1", "pos1", "size1", "extra1"},
-};
+std::vector<std::vector<std::string>> meta_data;
 
 std::string charArrayToString(const char* charArray) {
     return std::string(charArray);
@@ -159,6 +156,7 @@ int main()
             qm.parseQuery(query);
             if (qm.typeQuery == "SELECT") {
                 std::vector<std::vector<std::string>>meta_data_info = dataReader.read_meta_data(meta_data_path, qm.idsQueryResult);
+                meta_data = meta_data_info;
                 DiskIterator disk_iterator(disk, dataReader.get_register_size());
                 std::vector<std::vector<std::string>> answer_query = disk_iterator.iterateAndExtractRegs(meta_data_info);
                 qm.specifyFields(answer_query);
@@ -208,7 +206,7 @@ int main()
         if (ImGui::BeginPopupModal("Ver Metadata", NULL, ImGuiWindowFlags_AlwaysAutoResize))
         {
             ImGui::Text("Ubicacion del registro %d:", metaDataIndex);
-            for (int i = 0; i < meta_data[metaDataIndex].size(); i++)
+            for (int i = 1; i < meta_data[metaDataIndex].size(); i++)
             {
                 if (i > 0 && i % 5 == 0)
                     ImGui::Separator();
