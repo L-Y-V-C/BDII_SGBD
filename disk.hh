@@ -11,6 +11,11 @@ public:
 	std::vector<Plate> plates;
 	size_t current_char_pos;
 
+	Disk() {
+		current_char_pos = 0;
+		total_space = 0;
+	}
+
 	Disk(int in_plate_number, int in_track_number, int in_sector_number, int in_sector_size):
 		plate_number(in_plate_number),
 		track_number(in_track_number),

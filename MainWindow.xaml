@@ -32,74 +32,52 @@
                         <TextBlock Text="Número de Platos:" 
                               FontWeight="SemiBold" 
                               Foreground="#9B8784"/>
-                        <ComboBox x:Name="PlatosComboBox" 
-                             SelectedIndex="0" 
-                             Width="120"
-                             HorizontalAlignment="Left"
-                             Margin="0,5,0,0"
-                             Background="#9FA292"
-                             Foreground="White">
-                            <ComboBoxItem Content="1"/>
-                            <ComboBoxItem Content="2"/>
-                            <ComboBoxItem Content="3"/>
-                            <ComboBoxItem Content="4"/>
-                            <ComboBoxItem Content="5"/>
-                        </ComboBox>
+                        <AutoSuggestBox x:Name="PlatosComboBox"
+                            Width="120"
+                            HorizontalAlignment="Left"
+                            Margin="0,5,0,0"
+                            Background="#9FA292"
+                            Foreground="White"
+                            PlaceholderText="0"/>
                     </StackPanel>
 
                     <StackPanel Grid.Column="1" Margin="0,0,15,0">
                         <TextBlock Text="Pistas por Superficie:" 
                               FontWeight="SemiBold" 
                               Foreground="#9B8784"/>
-                        <ComboBox x:Name="PistasComboBox" 
-                             SelectedIndex="2"
-                             Width="120"
-                             HorizontalAlignment="Left"
-                             Margin="0,5,0,0"
-                             Background="#9FA292"
-                             Foreground="White">
-                            <ComboBoxItem Content="100"/>
-                            <ComboBoxItem Content="500"/>
-                            <ComboBoxItem Content="1000"/>
-                            <ComboBoxItem Content="2000"/>
-                            <ComboBoxItem Content="5000"/>
-                        </ComboBox>
+                        <AutoSuggestBox x:Name="PistasComboBox"
+                            Width="120"
+                            HorizontalAlignment="Left"
+                            Margin="0,5,0,0"
+                            Background="#9FA292"
+                            Foreground="White"
+                            PlaceholderText="0"/>
                     </StackPanel>
 
                     <StackPanel Grid.Column="2" Margin="0,0,15,0">
                         <TextBlock Text="Sectores por Pista:" 
                               FontWeight="SemiBold" 
                               Foreground="#9B8784"/>
-                        <ComboBox x:Name="SectoresComboBox" 
-                             SelectedIndex="0"
-                             Width="120"
-                             HorizontalAlignment="Left"
-                             Margin="0,5,0,0"
-                             Background="#9FA292"
-                             Foreground="White">
-                            <ComboBoxItem Content="64"/>
-                            <ComboBoxItem Content="128"/>
-                            <ComboBoxItem Content="256"/>
-                            <ComboBoxItem Content="512"/>
-                        </ComboBox>
+                        <AutoSuggestBox x:Name="SectoresComboBox"
+                                Width="120"
+                                HorizontalAlignment="Left"
+                                Margin="0,5,0,0"
+                                Background="#9FA292"
+                                Foreground="White"
+                                PlaceholderText="0"/>
                     </StackPanel>
 
                     <StackPanel Grid.Column="3" Margin="0,0,15,0">
                         <TextBlock Text="Tamaño de Sector:" 
                               FontWeight="SemiBold" 
                               Foreground="#9B8784"/>
-                        <ComboBox x:Name="TamanoSectorComboBox" 
-                             SelectedIndex="0"
-                             Width="120"
-                             HorizontalAlignment="Left"
-                             Margin="0,5,0,0"
-                             Background="#9FA292"
-                             Foreground="White">
-                            <ComboBoxItem Content="512"/>
-                            <ComboBoxItem Content="1024"/>
-                            <ComboBoxItem Content="2048"/>
-                            <ComboBoxItem Content="4096"/>
-                        </ComboBox>
+                        <AutoSuggestBox x:Name="TamanoSectorComboBox"
+                                Width="120"
+                                HorizontalAlignment="Left"
+                                Margin="0,5,0,0"
+                                Background="#9FA292"
+                                Foreground="White"
+                                PlaceholderText="0"/>
                     </StackPanel>
                 </Grid>
 

@@ -31,10 +31,19 @@ namespace winrt::DiscoSimulador::implementation
         try
         {
             // Obtener valores de configuración del disco
-            numPlatos = ObtenerValorComboBox(PlatosComboBox());
-            numPistas = ObtenerValorComboBox(PistasComboBox());
-            numSectores = ObtenerValorComboBox(SectoresComboBox());
-            tamanoSector = ObtenerValorComboBox(TamanoSectorComboBox());
+            numPlatos = winrt::to_string(PlatosComboBox().Text());
+            numPistas = winrt::to_string(PistasComboBox().Text());
+            numSectores = winrt::to_string(SectoresComboBox().Text());
+            tamanoSector = winrt::to_string(TamanoSectorComboBox().Text());
+
+            //DISK PART ----------------------------------------------------------------
+            disk.assign_size(std::stoi(numPlatos), std::stoi(numPistas), 
+                std::stoi(numSectores), std::stoi(tamanoSector));
+            //DISK MANAGER -------------------------------------------------------------
+            DiskManager diskManager(disk);
+            DataReader dataReader;
+
+            
 
             // Obtener nombres de archivos de los TextBox
             std::wstring estructuraW = ArchivoEstructuraTextBox().Text().c_str();
@@ -48,6 +57,10 @@ namespace winrt::DiscoSimulador::implementation
                 nombreArchivoEstructura = "struct_table.txt";
             if (nombreArchivoCSV.empty())
                 nombreArchivoCSV = "taxables.csv";
+
+            // read files --------------------------------------------------------
+            std::string data_str = dataReader.read_data(nombreArchivoCSV, nombreArchivoEstructura);
+
 
             // Crear configuración (ya no necesitamos superficies, solo platos y pistas)
             configuracion = ConfiguracionDisco(numPlatos, "2", numPistas, numSectores, tamanoSector);

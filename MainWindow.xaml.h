@@ -19,6 +19,7 @@
 
 #include "disk.hh"
 #include "tree.hh"
+#include "dataReader.hh"
 
 /*
 #include "interface.hh"
@@ -27,8 +28,6 @@
 #include "diskIterator.hh"
 
 #include "functions.hh"
-
-#include "tree.hh"
 */
 
 namespace winrt::DiscoSimulador::implementation
@@ -126,13 +125,16 @@ namespace winrt::DiscoSimulador::implementation
             Microsoft::UI::Xaml::RoutedEventArgs const& e);
 
     public:
+        Disk disk;
         std::string numPlatos;
         std::string numPistas;
         std::string numSectores;
         std::string tamanoSector;
         // Nombres de archivos configurables
-        std::string nombreArchivoEstructura = "struct_table.txt";
-        std::string nombreArchivoCSV = "taxables.csv";
+        std::string nombreArchivoEstructura;
+        std::string nombreArchivoCSV;
+        std::string disk_path = "disk.txt";
+        std::string meta_data_path = "meta_data.txt";
 
         // Miembros privados
         bool discoInicializado = false;
