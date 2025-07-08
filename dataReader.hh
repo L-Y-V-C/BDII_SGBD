@@ -32,6 +32,11 @@ public:
 		std::ifstream file(table_data_path);
 		std::string line;
 
+		if (!file.is_open())
+		{
+			std::cerr << "Error al abrir el archivo " << table_data_path << '\n';
+			return;
+		}
 
 		while (std::getline(file, line))
 		{

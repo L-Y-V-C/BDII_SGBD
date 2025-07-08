@@ -37,7 +37,7 @@ std::string charArrayToString(const char* charArray) {
     return std::string(charArray);
 }
 
-//dataReader.insert_query(diskManager, qm.tokens1, meta_data_path, data_path);
+
 
 int main()
 {
@@ -69,8 +69,8 @@ int main()
 
     std::string data_path,
         table_data_path,
-        disk_path("disk.txt"),
-        meta_data_path("meta_data.txt");
+        disk_path("C:\\Users\\tanuki\\source\\repos\\SGDB_DBII_UI\\source\\disk.txt"),
+        meta_data_path("C:\\Users\\tanuki\\source\\repos\\SGDB_DBII_UI\\source\\meta_data.txt");
     std::string query;
 
     bool showTable = false;
@@ -104,18 +104,19 @@ int main()
         }
 
         ImGui::Separator();
-        ImGui::InputText("struct table", fileNames[0], IM_ARRAYSIZE(fileNames[0]));
-        ImGui::InputText("data table", fileNames[1], IM_ARRAYSIZE(fileNames[1]));
+        ImGui::InputText("data", fileNames[0], IM_ARRAYSIZE(fileNames[0]));
+        ImGui::InputText("struct", fileNames[1], IM_ARRAYSIZE(fileNames[1]));
 
         if (ImGui::Button("Inicializar"))
         {
             printf("Inicializar presionado\n");
             // Aqu� enlaza Disk, DataReader y l�gica
-            Disk disk(numberInputs[0], numberInputs[1], numberInputs[2], numberInputs[3]);
+            disk.assign_size(numberInputs[0], numberInputs[1], numberInputs[2], numberInputs[3]);
             data_path = charArrayToString(fileNames[0]);
             table_data_path = charArrayToString(fileNames[1]);
             std::string data_str = dataReader.read_data(data_path, table_data_path);
             dataReader.write_data(diskManager, data_str, meta_data_path);
+            dataReader.debug();
             dataReader.write_data_on_txt(
                 disk_path,
                 data_str,
@@ -147,6 +148,8 @@ int main()
             qm.specifyFields(answer_query);
             finalFields = qm.finalFields;
             finalRegs = qm.finalRegs;
+
+            //dataReader.insert_query(diskManager, qm.tokens1, meta_data_path, data_path);
 
             showTable = true;
         }
